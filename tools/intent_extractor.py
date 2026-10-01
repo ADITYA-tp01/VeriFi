@@ -90,7 +90,7 @@ def _llm_intent(text: str) -> dict | None:
 
         client = Groq(api_key=api_key)
         resp = client.chat.completions.create(
-            model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+            model=os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"),
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": text[:2000]},

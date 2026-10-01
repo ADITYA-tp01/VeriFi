@@ -58,7 +58,7 @@ Opens at **http://localhost:8501** — keep this window open.
    - **Score: 105/135 · CRITICAL**
    - **Intent-Mechanism Mismatch: YES — +40**
    - The trace line: `mismatch → MISMATCH +40`
-   - Score breakdown bars: `url 50/50 · upi 45/55 · social 15/30`
+   - Score breakdown bars: `url 50/50 · upi 40/55 · social 15/30` (= 105)
 
 ### Shot B — Fixture 3: Incident Interview (~30 sec)
 
