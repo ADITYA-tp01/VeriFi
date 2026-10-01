@@ -1,9 +1,0 @@
-{
-  "intent": "RECEIVE_MONEY",
-  "mechanism": "SEND_MONEY",
-  "mismatch": true,
-  "expected_trigger": "+40 CRITICAL: claims RECEIVE, QR actually DEBITS",
-  "expected_level": "CRITICAL",
-  "min_score": 75,
-  "clarify_fires": false
-}

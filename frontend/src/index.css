@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light mode variables */
+    --bg-abyss: #F8FAFC;
+    --bg-panel: rgba(255, 255, 255, 0.7);
+    --border-glass: #E2E8F0;
+    --text-primary: #0F172A;
+    --text-muted: #475569;
+    --accent: linear-gradient(to right, #6366F1, #06B6D4);
+    --risk-critical: #DC2626;
+    --risk-high: #EA580C;
+    --risk-suspicious: #CA8A04;
+    --risk-clean: #059669;
+    --shadow-glass: 0 20px 40px rgba(15,23,42,0.08);
+  }
+
+  .dark {
+    /* Dark mode variables */
+    --bg-abyss: #070B14;
+    --bg-panel: rgba(15, 23, 42, 0.55);
+    --border-glass: rgba(148, 163, 184, 0.12);
+    --text-primary: #F1F5F9;
+    --text-muted: #94A3B8;
+    --accent: linear-gradient(to right, #6366F1, #06B6D4);
+    --risk-critical: #EF4444;
+    --risk-high: #F97316;
+    --risk-suspicious: #EAB308;
+    --risk-clean: #10B981;
+    --shadow-glass: 0 20px 40px rgba(0,0,0,0.35);
+  }
+
+  body {
+    @apply bg-bg-abyss text-text-primary antialiased text-[16px];
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-bg-panel backdrop-blur-[12px] border border-border-glass rounded-[20px];
+    box-shadow: var(--shadow-glass);
+  }
+
+  .glass-button {
+    @apply relative overflow-hidden font-medium rounded-xl transition-all duration-300;
+  }
+}
+
+/* Subtle background animations */
+.bg-orbs {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  overflow: hidden;
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08), transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.08), transparent 50%);
+  background-size: 200% 200%;
+  animation: bgPulse 15s ease-in-out infinite alternate;
+}
+
+@keyframes bgPulse {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}

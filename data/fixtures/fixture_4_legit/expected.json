@@ -1,7 +1,0 @@
-{
-  "mode": "ANALYZE",
-  "expected_level": "NO_STRONG_INDICATORS",
-  "max_score": 24,
-  "clarify_fires": false,
-  "intent": "RECEIVE_MONEY"
-}

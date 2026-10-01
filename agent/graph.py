@@ -107,6 +107,16 @@ def evidence_tools(state: AgentState) -> dict:
                 "decision": "ERROR",
                 "detail": f"QR decode failed: {decoded.get('reason')}",
             })
+    else:
+        # Fallback: check if the text itself contains a mechanism
+        match = re.search(r"(upi://[^\s]+|http[s]?://[^\s]+)", text, re.I)
+        if match:
+            mechanism = extract_mechanism(match.group(1))
+            trace.append({
+                "node": "mechanism_extractor",
+                "decision": mechanism["action"],
+                "detail": f"Text payload -> {mechanism['action']}: {mechanism['payload'][:80]}",
+            })
 
     # ── Mismatch engine (THE KILLER FEATURE) ──
     mm = detect_mismatch(intent, mechanism)
