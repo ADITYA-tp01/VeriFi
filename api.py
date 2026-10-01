@@ -1,6 +1,9 @@
 import uuid
+import os
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional
 import uvicorn
@@ -72,6 +75,22 @@ async def resume(req: ResumeRequest):
         return res
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# Mount static files for the frontend if the dist directory exists
+if os.path.exists("frontend/dist"):
+    app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets")
+    
+    @app.get("/{full_path:path}")
+    async def catch_all(full_path: str):
+        # Allow API routes to pass through
+        if full_path.startswith("api/"):
+            raise HTTPException(status_code=404, detail="Not Found")
+        
+        # Serve index.html for all other routes to support client-side routing
+        file_path = os.path.join("frontend/dist", full_path)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+        return FileResponse("frontend/dist/index.html")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

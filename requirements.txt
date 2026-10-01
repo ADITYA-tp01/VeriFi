@@ -1,8 +1,10 @@
 langgraph
-streamlit
 opencv-python-headless
 qrcode
 pillow
 groq
 python-dotenv
 tldextract
+fastapi
+uvicorn[standard]
+python-multipart
