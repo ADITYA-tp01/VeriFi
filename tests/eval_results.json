@@ -23,8 +23,7 @@
       "clarify_fired": false,
       "mismatch": false,
       "triggers": [
-        "+25 Brand impersonation (text says 'SBI', domain isn't)",
-        "+25 Lookalike/punycode domain [capped]",
+        "+50 Known malicious domain",
         "+15 Urgency/threat language"
       ],
       "pass": true

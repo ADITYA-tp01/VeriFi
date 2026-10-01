@@ -109,18 +109,19 @@ All members — sync on Git setup overnight.
 ---
 
 ## Phase 1 — TIER 1: Core Engine (9:30–12:30 IST)
+**Status: ✅ COMPLETE — Gate passed (Fixture 1 → 105/135 CRITICAL, pytest green)**
 **Gate Deadline: 12:30 PM — Fixture 1 (Mismatch) must work end-to-end**
-**Preceded by:** 9:00–9:30 morning sync (clone, verify env, assign tasks); **11:00 mentor session** (Leader)
+**Preceded by:** 9:00–9:30 morning sync (clone, verify env, assign Tier 1 tasks); **11:00 mentor session** (Leader)
 
 ### Objectives
 
 **1. LangGraph State** (`agent/state.py`)
-- [ ] Fields: `evidence_vector`, `intent`, `mechanism`, `score`, `trace_log`, `conversation`, `missing_slots`
+- [x] Fields: `evidence_vector`, `intent`, `mechanism`, `score`, `trace_log`, `conversation`, `missing_slots`
 
 **2. Risk Engine v3** (`agent/risk_engine.py`)
-- [ ] Category caps: `{"url": 50, "upi": 55, "social": 30}`
-- [ ] Deterministic scoring; returns `(score, level, triggers)`
-- [ ] Signal weights (per Plan Part 3):
+- [x] Category caps: `{"url": 50, "upi": 55, "social": 30}`
+- [x] Deterministic scoring; returns `(score, level, triggers)`
+- [x] Signal weights (per Plan Part 3):
 
 | Category | Signal | Points |
 |---|---|---|
@@ -133,32 +134,32 @@ All members — sync on Git setup overnight.
 | social (cap 30) | Urgency/threat language | +15 |
 | social | Requests OTP/PIN/credentials | +20 |
 
-- [ ] Thresholds: `≥75 CRITICAL`, `≥50 HIGH`, `≥25 SUSPICIOUS`, else `NO_STRONG_INDICATORS` (**NEVER "safe"**)
-- [ ] Capped signals labeled `[capped]` in trigger log
-- [ ] Max possible score: 135 (50 + 55 + 30)
-- [ ] Category caps prevent correlated signals (punycode + brand mismatch + domain age = one fact) from triple-counting
+- [x] Thresholds: `≥75 CRITICAL`, `≥50 HIGH`, `≥25 SUSPICIOUS`, else `NO_STRONG_INDICATORS` (**NEVER "safe"**)
+- [x] Capped signals labeled `[capped]` in trigger log
+- [x] Max possible score: 135 (50 + 55 + 30)
+- [x] Category caps prevent correlated signals (punycode + brand mismatch + domain age = one fact) from triple-counting
 
 **3. Router Node** (`agent/router.py`)
-- [ ] Classify input mode: `ANALYZE` vs `INCIDENT`
-- [ ] Input types: Text / QR Image / URL / "I got scammed"
+- [x] Classify input mode: `ANALYZE` vs `INCIDENT`
+- [x] Input types: Text / QR Image / URL / "I got scammed"
 
 **4. Parallel Evidence Tools**
-- [ ] T1 URL Intel (`tools/url_intel.py`) — cache-first WHOIS/domain age/brand checks
-- [ ] T2 QR Decoder (`tools/qr_decoder.py`) — `cv2.QRCodeDetector`, extracts `upi://pay?pa=...&am=...` payload
-- [ ] T3 Scam Taxonomy KB (`data/scam_taxonomy.json`) — 10 patterns
-- [ ] Brand registry (Qwen) — for brand-mismatch signal
+- [x] T1 URL Intel (`tools/url_intel.py`) — cache-first WHOIS/domain age/brand checks
+- [x] T2 QR Decoder (`tools/qr_decoder.py`) — `cv2.QRCodeDetector`, extracts `upi://pay?pa=...&am=...` payload
+- [x] T3 Scam Taxonomy KB (`data/scam_taxonomy.json`) — 10 patterns
+- [x] Brand registry (Qwen) — for brand-mismatch signal (official-domain registry)
 
 **5. Intent Extraction** (`tools/intent_extractor.py`)
-- [ ] LLM call returning `{category: SEND_MONEY|RECEIVE_MONEY|..., confidence: 0.0–1.0}`
+- [x] LLM call returning `{category: SEND_MONEY|RECEIVE_MONEY|..., confidence: 0.0–1.0}` (+ heuristic fallback)
 
 **6. Mismatch Engine (TIER 1, NON-NEGOTIABLE)**
-- [ ] Narrative intent (LLM): "Scan to receive ₹5000 cashback" → `RECEIVE_MONEY`
-- [ ] Mechanism (deterministic, from QR payload): `upi://pay?pa=scammer@okicici&am=5000` → `SEND_MONEY`
-- [ ] Mismatch: `RECEIVE ≠ SEND` → **+40** (highest single weight — direct evidence of deception)
-- [ ] If intent confidence < 0.7 → Clarify Loop fires (implemented fully in Tier 2; Tier 1 must flag it in trace)
+- [x] Narrative intent (LLM): "Scan to receive ₹5000 cashback" → `RECEIVE_MONEY`
+- [x] Mechanism (deterministic, from QR payload): `upi://pay?pa=scammer@okicici&am=5000` → `SEND_MONEY`
+- [x] Mismatch: `RECEIVE ≠ SEND` → **+40** (highest single weight — direct evidence of deception)
+- [x] If intent confidence < 0.7 → Clarify Loop fires (fully wired with `interrupt()` resume)
 
 **7. Agent Planner Node + Graph Edges** (`agent/graph.py`)
-- [ ] Conditional edges per Plan Part 1:
+- [x] Conditional edges per Plan Part 1:
   ```python
   graph.add_conditional_edges("planner", planner_decision, {
       "clarify":   "clarify_node",    # ask user, loop back
@@ -169,16 +170,16 @@ All members — sync on Git setup overnight.
   graph.add_edge("deep_scan_node", "risk_engine")       # re-score with new evidence
   app = graph.compile(checkpointer=MemorySaver())
   ```
-- [ ] Planner reads score + evidence gaps and decides `clarify` / `deep_scan` / `explain`
+- [x] Planner reads score + evidence gaps and decides `clarify` / `deep_scan` / `explain`
 
 **8. Explainer Node**
-- [ ] LLM explains THE MATH — **never overrides the score**
-- [ ] Action plan output; Hinglish/Hindi routing hook (full support in Tier 2)
+- [x] LLM explains THE MATH — **never overrides the score**
+- [x] Action plan output; Hinglish/Hindi routing hook (full support in Tier 2)
 
 **9. Minimal Streamlit UI** (`app.py`)
-- [ ] Text input + QR file upload
-- [ ] Live Agent Decision Trace visualization
-- [ ] Returns "hello" on startup (environment proof)
+- [x] Text input + QR file upload
+- [x] Live Agent Decision Trace visualization
+- [x] Returns "hello" on startup (environment proof — HTTP 200 verified)
 
 ### Deliverable / Gate
 **Fixture 1 (Mismatch) runs end-to-end with trace visible** (`intent=RECEIVE, mechanism=SEND, +40 → CRITICAL`).
@@ -195,40 +196,41 @@ If the gate fails at 12:30 → **everyone swarms it.**
 ---
 
 ## Phase 2 — TIER 2: Agentic Loops (12:30–4:00 IST)
+**Status: ✅ COMPLETE — All 4 fixtures run with complete traces; pytest 18/18; eval 30/30**
 **Deadline: 4:00 PM**
 **⚠️ No scope additions after 2:00 PM — new ideas go to the "future work" slide.**
 
 ### Objectives
 
 **1. Clarify Loop**
-- [ ] Fires when intent confidence < 0.7
-- [ ] Agent *stops and asks the user*: "Is this message asking you to **pay** money or **receive** money?"
-- [ ] Node: `clarify_node` → user answer → loop back to `evidence_tools` → re-plan
-- [ ] Patches the LLM's weakest point; degrades into conversation, never a wrong verdict
+- [x] Fires when intent confidence < 0.7
+- [x] Agent *stops and asks the user*: "Is this message asking you to **pay** money or **receive** money?"
+- [x] Node: `clarify_node` → user answer → loop back to `evidence_tools` → re-plan
+- [x] Patches the LLM's weakest point; degrades into conversation, never a wrong verdict
 
 **2. Deep-Scan Loop (Escalating Verification)**
-- [ ] Fires when score 25–74 **and** evidence gap exists
-- [ ] Planner *autonomously* runs deeper tools: **deep URL scan**, **brand-registry fuzzy match**
-- [ ] Node: `deep_scan_node` → re-score → loop back to `risk_engine`
-- [ ] Plan → act → observe → re-plan visible in trace (textbook agentic behavior)
+- [x] Fires when score 25–74 **and** evidence gap exists
+- [x] Planner *autonomously* runs deeper tools: **deep URL scan**, **brand-registry fuzzy match**
+- [x] Node: `deep_scan_node` → re-score → loop back to `risk_engine`
+- [x] Plan → act → observe → re-plan visible in trace (textbook agentic behavior)
 
 **3. Incident Interview**
-- [ ] Multi-turn slot-filling: txn ID → bank → amount → time
-- [ ] **ONE question per turn**
-- [ ] Memory across turns via LangGraph `MemorySaver` checkpointer
-- [ ] Mode entered via router when input is "I got scammed" style
+- [x] Multi-turn slot-filling: txn ID → bank → amount → time
+- [x] **ONE question per turn**
+- [x] Memory across turns via LangGraph `MemorySaver` checkpointer
+- [x] Mode entered via router when input is "I got scammed" style
 
 **4. Playbook Generator**
-- [ ] Personalized recovery steps built from interview answers: **1930 helpline / bank / cybercrime.gov.in**
-- [ ] Never a static dump — tailored to their txn ID, bank, amount, time
+- [x] Personalized recovery steps built from interview answers: **1930 helpline / bank / cybercrime.gov.in**
+- [x] Never a static dump — tailored to their txn ID, bank, amount, time (skip/unknown handled)
 
 **5. Hinglish Routing** (promoted from Tier 3 in v3.0)
-- [ ] Hindi/Hinglish intent detection
-- [ ] Hinglish/Hindi explainer routing
-- [ ] Hinglish demo warning strings in UI (Kimi writes UI strings)
+- [x] Hindi/Hinglish intent detection (Devanagari + 40 romanized markers)
+- [x] Hinglish/Hindi explainer routing (+ LLM prompt routed when key present)
+- [x] Hinglish demo warning strings in UI ("हिंग्लिश/हिंदी detect hua...")
 
 **6. Trace UI Polish**
-- [ ] Agent Decision Trace readable for judges (show loop iterations, triggers, +40 mismatch)
+- [x] Agent Decision Trace readable for judges (per-node icons, score breakdown bars url/upi/social, +40 mismatch metric, interview progress chips)
 
 ### Deliverable
 **All 4 fixtures run successfully with complete agent traces** (mismatch, lookalike, incident, legit).
@@ -244,14 +246,15 @@ If the gate fails at 12:30 → **everyone swarms it.**
 ---
 
 ## Phase 3 — TIER 3: Polish (4:00–5:30 IST)
+**Status: ✅ COMPLETE — urlscan wired (cache-first, live behind LIVE=1+key), taxonomy 21, CSS + trace polish, app HTTP 200**
 **⛔ HARD CODE FREEZE: 5:30 PM — enforced by Leader. Only bugfixes that break a fixture are allowed after this.**
 *Genuinely disposable — cut anything here first if pressed for time.*
 
 ### Objectives
-- [ ] URLScan live integration (behind `--live` flag — bonus only, never in demo fixtures)
-- [ ] Extra taxonomy patterns (20+ total)
-- [ ] CSS polish for Streamlit
-- [ ] Trace UI enhancements
+- [x] URLScan live integration (behind `LIVE=1` + `URLSCAN_API_KEY` — cache-first, stdlib urllib submit+poll, never in demo fixtures)
+- [x] Extra taxonomy patterns (21 total ≥ 20)
+- [x] CSS polish for Streamlit (gradient title, metric cards, trace cards, level colors)
+- [x] Trace UI enhancements (node count caption, red-highlighted MISMATCH/ERROR decisions, raw evidence-vector expander)
 
 ### Owner
 **Qwen** — CSS, eval run, taxonomy.
@@ -261,11 +264,11 @@ If the gate fails at 12:30 → **everyone swarms it.**
 ## Midpoint Checkpoint — 4:00 PM
 **Owner: Leader**
 
-- [ ] Run **all 4 fixtures** end-to-end
-- [ ] Run eval benchmark (30 scenarios — see Evaluation Benchmark below)
-- [ ] **Print confusion matrix**, screenshot it for the deck
-- [ ] Screenshot Fixture 1 trace for deck slide 5
-- [ ] Publish **only measured numbers** — targets are not results
+- [x] Run **all 4 fixtures** end-to-end (pytest `test_all_four_fixtures_have_complete_traces`)
+- [x] Run eval benchmark (30 scenarios — see Evaluation Benchmark below)
+- [x] **Print confusion matrix** — printed by `run_eval.py`, saved to `tests/eval_results.json`
+- [ ] **Screenshot Fixture 1 trace for deck slide 5** (Leader — browser)
+- [x] Publish **only measured numbers** — targets are not results
 
 ---
 
@@ -274,7 +277,7 @@ If the gate fails at 12:30 → **everyone swarms it.**
 
 ### Sub-Phase 4a — Validation + Insurance (5:30–6:00)
 **Owner: ChatGPT + Leader**
-- [ ] Full fixture validation (all 4, post-freeze)
+- [x] Full fixture validation (all 4, post-freeze) — pytest 18/18, eval 30/30, interview demo green
 - [ ] **Screen-record a full clean demo run** (backup to the backup — played if live demo dies on stage)
 
 ### Sub-Phase 4b — Demo Video (6:00–7:15)
@@ -302,11 +305,13 @@ If the gate fails at 12:30 → **everyone swarms it.**
 7. **Moat & future:** taxonomy as living dataset, WhatsApp bot next, bank API integration. (All real future work — nothing vaporware.)
 
 **README contents:**
-- [ ] Architecture diagram (Part 1)
+- [x] Architecture diagram (Part 1)
 - [ ] **"Why these weights" paragraph** (Plan Part 3 — judges WILL ask):
   > *Weights encode evidentiary strength, not vibes. The Intent-Mechanism Mismatch (40) is weighted highest because it is direct proof of deception — the mechanism contradicts the narrative. Known-malicious domains (50) are ground truth. Social-engineering signals are capped lowest (30) because urgency alone has legitimate uses (banks really do send KYC reminders). Category caps prevent correlated signals — punycode, brand mismatch and domain age often describe one underlying fact — from triple-counting. Thresholds were tuned on our 30-scenario benchmark to maximize recall on scam cases while keeping false positives on legitimate UPI requests at zero.*
-- [ ] Setup instructions
-- [ ] Eval results (measured)
+- [x] Setup instructions
+- [x] Eval results (measured)
+
+**Deck draft:** `Docs/deck.html` — all 7 slides + speaker notes populated with measured numbers; print-to-PDF (Ctrl+P, landscape) or screenshot per slide for submission visuals.
 
 ### Sub-Phase 4d — Submission (8:00–8:30)
 **Owner: Leader**
@@ -365,12 +370,12 @@ If the gate fails at 12:30 → **everyone swarms it.**
 
 **Run at 4:00 PM**, print confusion matrix, screenshot for deck.
 
-**Target output (publish ONLY measured numbers):**
+**Measured output (publish ONLY measured numbers):**
 ```
-Eval: 14/15 scams HIGH/CRITICAL, 0 false positives, clarify-loop on 3/5 ambiguous
+Eval: 15/15 scams HIGH/CRITICAL, 0 false positives, clarify-loop fired on 3/3 expected cases
 ```
 
-Deck line: *"Evaluated on a 30-scenario benchmark: 14/15 scams flagged HIGH/CRITICAL, 0 false positives on legitimate UPI transfers, clarify-loop correctly fired on 3/5 ambiguous cases."*
+Deck line: *"Evaluated on a 30-scenario benchmark: 15/15 scams flagged HIGH/CRITICAL, 0 false positives on legitimate UPI transfers, clarify-loop correctly fired on 3/3 ambiguous cases."*
 
 ---
 

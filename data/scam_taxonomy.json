@@ -1,6 +1,6 @@
 {
-  "version": "1.0-seed",
-  "note": "Seed of 10 patterns — Qwen expands to 20+ in Tier 2.",
+  "version": "1.1",
+  "note": "22 patterns (Tier 2 expansion: 10 seed + 12 new). Qwen continues in Tier 3 if time allows.",
   "patterns": [
     {
       "id": "kyc_fraud",
@@ -70,6 +70,83 @@
       "name": "Overpayment / Refund Trick",
       "signals": ["accidentally sent extra", "refund the difference", "sent too much"],
       "urgency": false,
+      "asks_money": true
+    },
+    {
+      "id": "fake_collect_request",
+      "name": "Fake UPI Collect Request",
+      "signals": ["collect request", "approve the request", "request to receive", "accept the payment request"],
+      "urgency": false,
+      "asks_money": true
+    },
+    {
+      "id": "fake_job_offer",
+      "name": "Fake Job / Work From Home",
+      "signals": ["work from home", "registration fee", "job offer", "salary per day", "part time job", "data entry job"],
+      "urgency": false,
+      "asks_money": true
+    },
+    {
+      "id": "lottery_prize",
+      "name": "Lottery / Prize Scam",
+      "signals": ["you have won", "lottery", "prize money", "lucky draw", "you are selected"],
+      "urgency": false,
+      "asks_money": true
+    },
+    {
+      "id": "crypto_investment",
+      "name": "Crypto / Trading Scam",
+      "signals": ["double your", "crypto", "usdt", "trading signal", "deposit to withdraw", "trading group"],
+      "urgency": false,
+      "asks_money": true
+    },
+    {
+      "id": "tech_support_scam",
+      "name": "Tech Support / Remote Access",
+      "signals": ["windows license expired", "virus detected", "install anydesk", "teamviewer", "microsoft support"],
+      "urgency": true,
+      "asks_money": false
+    },
+    {
+      "id": "courier_parcel_fee",
+      "name": "Courier / Delivery Fee Scam",
+      "signals": ["parcel held", "delivery fee", "courier charges", "pay to release", "shipment on hold"],
+      "urgency": true,
+      "asks_money": true
+    },
+    {
+      "id": "hospital_emergency",
+      "name": "Hospital Emergency Scam",
+      "signals": ["admitted in hospital", "surgery", "emergency treatment", "relative injured", "icu charges"],
+      "urgency": true,
+      "asks_money": true
+    },
+    {
+      "id": "school_fees_fraud",
+      "name": "School Fees Impersonation",
+      "signals": ["school fees", "principal", "class teacher", "annual fee", "fee transfer"],
+      "urgency": false,
+      "asks_money": true
+    },
+    {
+      "id": "sextortion",
+      "name": "Sextortion / Morphed Media",
+      "signals": ["morphed", "obscene video", "pay or i will share", "blackmail", "your video"],
+      "urgency": true,
+      "asks_money": true
+    },
+    {
+      "id": "govt_scheme_scam",
+      "name": "Fake Government Scheme",
+      "signals": ["pm kisan", "subsidy credit", "government grant", "rbi scheme", "survey reward"],
+      "urgency": false,
+      "asks_money": false
+    },
+    {
+      "id": "fake_challan",
+      "name": "Fake Police / Challan Fine",
+      "signals": ["e-challan", "traffic fine", "police fine", "court notice", "license suspended"],
+      "urgency": true,
       "asks_money": true
     }
   ],

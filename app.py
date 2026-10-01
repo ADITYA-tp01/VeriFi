@@ -1,7 +1,6 @@
 """VeriFi — Evidence-Driven Financial Safety Agent. Run: streamlit run app.py"""
 from __future__ import annotations
 
-import json
 import uuid
 from pathlib import Path
 
@@ -12,6 +11,41 @@ from agent.graph import app
 
 st.set_page_config(page_title="VeriFi", page_icon="🛡️", layout="wide")
 
+st.markdown(
+    """
+    <style>
+    h1[data-testid="stTitle"] {
+        letter-spacing: .5px;
+        background: linear-gradient(90deg, #2563eb, #7c3aed);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent !important;
+    }
+    [data-testid="stMetricValue"] { font-variant-numeric: tabular-nums; }
+    [data-testid="stMetric"] {
+        background: rgba(128,128,128,.07);
+        border: 1px solid rgba(128,128,128,.18);
+        border-radius: 12px;
+        padding: 12px 16px;
+    }
+    .vf-trace {
+        border-left: 4px solid #3b82f6;
+        background: rgba(128,128,128,.06);
+        border-radius: 6px;
+        padding: 7px 13px;
+        margin: 5px 0;
+    }
+    .vf-trace b { color: #3b82f6; }
+    .vf-decision { color: #dc2626; font-weight: 700; }
+    .vf-score-critical { color: #dc2626; font-weight: 800; }
+    .vf-score-high { color: #ea580c; font-weight: 800; }
+    .vf-score-suspicious { color: #ca8a04; font-weight: 800; }
+    .vf-score-clear { color: #16a34a; font-weight: 800; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 FIX = Path(__file__).resolve().parent / "data" / "fixtures"
 
 LEVEL_COLORS = {
@@ -19,6 +53,22 @@ LEVEL_COLORS = {
     "HIGH": "🟠",
     "SUSPICIOUS": "🟡",
     "NO_STRONG_INDICATORS": "🟢",
+}
+
+SCORE_CSS = {
+    "CRITICAL": "vf-score-critical",
+    "HIGH": "vf-score-high",
+    "SUSPICIOUS": "vf-score-suspicious",
+    "NO_STRONG_INDICATORS": "vf-score-clear",
+}
+
+BAD_DECISIONS = ("MISMATCH +40", "ERROR")
+
+NODE_ICONS = {
+    "router": "🧭", "intent": "🧠", "qr_decode": "📷", "mismatch": "⚡",
+    "url_intel": "🔍", "social": "🗣️", "taxonomy": "📚", "language": "🌐",
+    "risk_engine": "🧮", "planner": "🤖", "clarify": "❓", "deep_scan": "🔬",
+    "explainer": "💬", "incident_interview": "🎙️", "playbook": "📋",
 }
 
 if "thread_id" not in st.session_state:
@@ -42,6 +92,13 @@ def resume_graph(answer: str):
     return app.invoke(Command(resume=answer), config)
 
 
+def load_result(result: dict):
+    """Store result and pick up any pending interrupt (clarify / interview)."""
+    st.session_state.last_result = result
+    interrupts = result.get("__interrupt__")
+    st.session_state.waiting_answer = interrupts[0].value if interrupts else None
+
+
 def render_result(result: dict):
     score = result.get("score", 0)
     level = result.get("risk_level", "NO_STRONG_INDICATORS")
@@ -49,35 +106,65 @@ def render_result(result: dict):
 
     c1, c2, c3 = st.columns([1, 1, 2])
     c1.metric("Score", f"{score}/135")
-    c2.metric("Level", f"{icon} {level}")
+    c2.markdown(
+        f"<div>Level</div><div class='{SCORE_CSS.get(level, '')}' "
+        f"style='font-size:1.4rem'>{icon} {level}</div>",
+        unsafe_allow_html=True,
+    )
     mismatch = (result.get("evidence_vector") or {}).get("intent_mechanism_mismatch")
     c3.metric("Intent-Mechanism Mismatch", "YES — +40 CRITICAL" if mismatch else "No")
 
-    if result.get("explanation"):
+    # Per-category breakdown (caps: url 50, upi 55, social 30)
+    bd = result.get("score_breakdown")
+    if bd:
+        b1, b2, b3 = st.columns(3)
+        b1.progress(min(1.0, bd.get("url", 0) / 50), text=f"url {bd.get('url', 0)}/50")
+        b2.progress(min(1.0, bd.get("upi", 0) / 55), text=f"upi {bd.get('upi', 0)}/55")
+        b3.progress(min(1.0, bd.get("social", 0) / 30), text=f"social {bd.get('social', 0)}/30")
+
+    if result.get("language") == "hinglish":
+        st.info("हिंग्लिश/हिंदी detect hua — explanation Hinglish me di gayi hai (see below).")
+
+    if result.get("playbook"):
+        st.subheader("🚨 Personalized Recovery Playbook")
+        st.markdown(result["playbook"])
+    elif result.get("explanation"):
         st.subheader("Explanation")
         st.info(result["explanation"])
 
     triggers = result.get("triggers") or []
-    st.subheader("Triggers")
-    if triggers:
-        for t in triggers:
-            st.write(f"- {t}")
-    else:
-        st.write("- No strong indicators detected.")
+    if not result.get("playbook"):
+        st.subheader("Triggers")
+        if triggers:
+            for t in triggers:
+                st.write(f"- {t}")
+        else:
+            st.write("- No strong indicators detected.")
 
+    trace = result.get("trace_log") or []
     st.subheader("Agent Decision Trace")
-    for i, entry in enumerate(result.get("trace_log") or [], 1):
+    st.caption(f"{len(trace)} nodes executed — plan → act → observe → re-plan")
+    for i, entry in enumerate(trace, 1):
+        icon = NODE_ICONS.get(entry["node"], "•")
+        decision = entry["decision"]
+        cls = "vf-decision" if decision in BAD_DECISIONS else ""
         st.markdown(
-            f"**{i}. `{entry['node']}`** → **{entry['decision']}**  \n"
-            f"<small>{entry['detail']}</small>",
+            f"<div class='vf-trace'>{icon} <b>{i}. {entry['node']}</b> "
+            f"&rarr; <span class='{cls}'>{decision}</span><br>"
+            f"<small>{entry['detail']}</small></div>",
             unsafe_allow_html=True,
         )
+
+    with st.expander("Evidence vector (raw) — show your work"):
+        st.json(result.get("evidence_vector") or {})
+        if result.get("score_breakdown"):
+            st.caption(f"score_breakdown: {result['score_breakdown']}")
 
 
 # ── Input form ──
 with st.form("analyze_form"):
     text = st.text_area(
-        "Message / text to analyze",
+        "Message / text to analyze (or describe a scam that already happened)",
         placeholder="Paste the suspicious SMS, WhatsApp message, or UPI request here...",
         height=120,
     )
@@ -89,45 +176,46 @@ if submitted and (text or qr_file):
         payload = {"user_input": text or ""}
         if qr_file is not None:
             payload["qr_image"] = qr_file.getvalue()
-        result = run_graph(payload)
-    st.session_state.last_result = result
+        load_result(run_graph(payload))
 
-    interrupts = result.get("__interrupt__")
-    if interrupts:
-        st.session_state.waiting_answer = interrupts[0].value
-    else:
-        st.session_state.waiting_answer = None
-
-# ── Clarify loop: agent asked a question ──
+# ── Pending question: clarify loop OR incident interview turn ──
 if st.session_state.waiting_answer:
-    st.warning(f"🤔 **VeriFi asks:** {st.session_state.waiting_answer}")
-    answer = st.text_input("Your answer (e.g. 'pay' or 'receive')", key="answer_box")
+    result = st.session_state.last_result or {}
+    is_incident = result.get("mode") == "INCIDENT"
+    if is_incident:
+        slots = result.get("incident_slots") or {}
+        filled = " · ".join(f"**{k}**: {v}" for k, v in slots.items()) or "_none yet_"
+        st.info(f"🎙️ **Incident interview** — answered so far: {filled}")
+        label = f"Answer (question {len(slots) + 1}/4 — e.g. TXN7845123690, HDFC, 15000, or 'skip')"
+    else:
+        st.warning(f"🤔 **VeriFi asks:** {st.session_state.waiting_answer}")
+        label = "Your answer (e.g. 'pay' or 'receive')"
+    answer = st.text_input(label, key="answer_box")
     if st.button("Submit answer"):
-        with st.spinner("Re-planning..."):
-            result = resume_graph(answer)
-        st.session_state.last_result = result
-        interrupts = result.get("__interrupt__")
-        st.session_state.waiting_answer = interrupts[0].value if interrupts else None
+        with st.spinner("Continuing..."):
+            load_result(resume_graph(answer))
         st.rerun()
 
-# ── Render ──
-if st.session_state.last_result:
+# ── Render (skip while interview question is pending — shown above) ──
+if st.session_state.last_result and not st.session_state.waiting_answer:
     render_result(st.session_state.last_result)
 
-# ── Fixture shortcuts (hermetic demo) ──
+# ── Fixture shortcuts (hermetic demo — no live network) ──
 st.divider()
 st.caption("Hermetic demo fixtures (no live network):")
 cols = st.columns(4)
-if cols[0].button("Load Fixture 1: Mismatch"):
-    msg = (FIX / "fixture_1_mismatch" / "message.txt").read_text(encoding="utf-8")
-    qr = (FIX / "fixture_1_mismatch" / "qr.png").read_bytes()
-    st.session_state.thread_id = str(uuid.uuid4())  # fresh thread per fixture
-    st.session_state.last_result = run_graph({"user_input": msg, "qr_image": qr})
-    st.session_state.waiting_answer = None
-    st.rerun()
-if cols[1].button("Load Fixture 2: Lookalike"):
-    msg = (FIX / "fixture_2_lookalike" / "message.txt").read_text(encoding="utf-8")
-    st.session_state.thread_id = str(uuid.uuid4())
-    st.session_state.last_result = run_graph({"user_input": msg})
-    st.session_state.waiting_answer = None
-    st.rerun()
+
+FIXTURES = {
+    0: ("Fixture 1: Mismatch", "fixture_1_mismatch", True),
+    1: ("Fixture 2: Lookalike", "fixture_2_lookalike", False),
+    2: ("Fixture 3: Incident", "fixture_3_incident", False),
+    3: ("Fixture 4: Legit", "fixture_4_legit", False),
+}
+for idx, (label, folder, has_qr) in FIXTURES.items():
+    if cols[idx].button(label):
+        payload = {"user_input": (FIX / folder / "message.txt").read_text(encoding="utf-8")}
+        if has_qr:
+            payload["qr_image"] = (FIX / folder / "qr.png").read_bytes()
+        st.session_state.thread_id = str(uuid.uuid4())  # fresh thread per fixture
+        load_result(run_graph(payload))
+        st.rerun()

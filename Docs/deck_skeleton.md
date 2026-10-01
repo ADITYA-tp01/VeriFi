@@ -34,17 +34,18 @@
 - Router → parallel evidence tools → risk engine → planner
 - Loop 1: confidence < 0.7 → agent *asks the user*, re-plans
 - Loop 2: score 25–74 + gap → agent *escalates tools autonomously*, re-scores
-- Loop 3: incident interview with checkpointer memory (Tier 2)
+- Loop 3: incident interview with checkpointer memory → personalized playbook
 - Full agent decision trace visible in the UI — plan→act→observe→re-plan, on screen
 
 ## Slide 5 — Live Demo Results
 **Title:** *Fixture 1 trace + benchmark numbers*
 
 - Trace screenshot: `intent=RECEIVE, mechanism=SEND, +40 → 105/135 CRITICAL`
-- Eval (30 scenarios) — **paste measured numbers**:
-  - `Scams HIGH/CRITICAL: [from eval_results.json]`
-  - `False positives on legit UPI: [from eval_results.json]`
-  - `Clarify-loop fired: [from eval_results.json]`
+- Eval (30 scenarios) — **measured** (from `tests/eval_results.json`):
+  - `Scams HIGH/CRITICAL: 15/15`
+  - `False positives on legit UPI: 0/10`
+  - `Clarify-loop fired: 3/3 expected cases`
+  - `Edge cases: 5/5`
 - Hermetic fixtures — demo cannot fail on stage
 
 ## Slide 6 — Bharat Impact
@@ -58,7 +59,7 @@
 ## Slide 7 — Moat & Future
 **Title:** *What others can't copy quickly*
 
-- **Taxonomy as a living dataset** — 10 → 20+ patterns, grows with every reported scam
+- **Taxonomy as a living dataset** — 10 → 21 patterns, grows with every reported scam
 - Next: WhatsApp bot delivery, bank API integration for real-time txn verification
 - Everything on this slide is real future work — nothing vaporware
 

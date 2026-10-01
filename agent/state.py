@@ -21,6 +21,7 @@ class AgentState(TypedDict, total=False):
     score: int
     risk_level: str                       # CRITICAL | HIGH | SUSPICIOUS | NO_STRONG_INDICATORS
     triggers: list                        # human-readable trigger log
+    score_breakdown: dict                 # {"url": n, "upi": n, "social": n} per-category points
 
     # ── Agentic loop bookkeeping ──
     clarify_needed: bool                  # planner: intent ambiguous?
@@ -34,6 +35,7 @@ class AgentState(TypedDict, total=False):
     conversation: Annotated[list, add]    # full turn history
     trace_log: Annotated[list, add]       # agent decision trace (UI shows this)
     explanation: str                      # LLM's explanation of the math
+    language: str                         # "en" | "hinglish" (routing for explainer)
     incident_slots: dict                  # txn_id, bank, amount, time (incident mode)
     playbook: str                         # personalized recovery steps
 

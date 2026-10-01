@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>VeriFi — Pitch Deck</title>
+<style>
+  :root {
+    --bg: #0b1020; --card: #121a33; --ink: #eef2ff;
+    --muted: #94a3c4; --blue: #3b82f6; --violet: #7c3aed;
+    --red: #ef4444; --green: #22c55e; --amber: #f59e0b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    line-height: 1.45;
+  }
+  .slide {
+    min-height: 100vh; padding: 7vh 9vw;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; border-bottom: 1px solid #1e293b;
+  }
+  .kicker {
+    color: var(--blue); font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; font-size: 14px; margin-bottom: 14px;
+  }
+  h1 { font-size: clamp(34px, 5vw, 58px); line-height: 1.1; margin-bottom: 26px; }
+  h1 .grad { background: linear-gradient(90deg, var(--blue), var(--violet));
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  ul { list-style: none; }
+  li { font-size: clamp(17px, 1.8vw, 23px); padding: 10px 0 10px 34px; position: relative; color: var(--muted); }
+  li::before { content: "▸"; position: absolute; left: 6px; color: var(--blue); }
+  li b, li strong { color: var(--ink); }
+  .big { font-size: clamp(22px, 2.6vw, 34px); font-weight: 800; color: var(--ink); padding: 6px 0; }
+  .pill { display: inline-block; padding: 4px 14px; border-radius: 999px;
+    font-weight: 700; font-size: 15px; margin: 4px 8px 4px 0; }
+  .pill.red { background: rgba(239,68,68,.15); color: var(--red); border: 1px solid rgba(239,68,68,.4); }
+  .pill.green { background: rgba(34,197,94,.12); color: var(--green); border: 1px solid rgba(34,197,94,.4); }
+  .pill.amber { background: rgba(245,158,11,.12); color: var(--amber); border: 1px solid rgba(245,158,11,.4); }
+  .pill.blue { background: rgba(59,130,246,.14); color: var(--blue); border: 1px solid rgba(59,130,246,.45); }
+  .stats { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 26px; }
+  .stat { background: var(--card); border: 1px solid #24304f; border-radius: 16px;
+    padding: 20px 28px; min-width: 190px; }
+  .stat .n { font-size: clamp(30px, 3.4vw, 44px); font-weight: 800; }
+  .stat .n.good { color: var(--green); } .stat .n.bad { color: var(--red); }
+  .stat .l { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: center; }
+  .box { background: var(--card); border: 1px solid #24304f; border-radius: 16px; padding: 24px 28px; }
+  .box h3 { color: var(--blue); font-size: 15px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+  .vs { text-align: center; font-size: clamp(26px, 3vw, 40px); font-weight: 900; color: var(--red); }
+  .loop { display: flex; gap: 16px; align-items: baseline; padding: 12px 0; }
+  .loop .num { background: linear-gradient(135deg, var(--blue), var(--violet));
+    color: #fff; border-radius: 10px; width: 40px; height: 40px; display: grid; place-items: center;
+    font-weight: 800; flex-shrink: 0; }
+  .loop .txt { font-size: clamp(16px, 1.7vw, 21px); color: var(--muted); }
+  .loop .txt b { color: var(--ink); }
+  .foot { position: absolute; bottom: 3vh; left: 9vw; right: 9vw; display: flex;
+    justify-content: space-between; color: #475569; font-size: 13px; }
+  .quote { font-size: clamp(19px, 2.1vw, 27px); font-style: italic; color: var(--ink);
+    border-left: 4px solid var(--violet); padding-left: 22px; margin-top: 26px; }
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .slide { min-height: 100vh; page-break-after: always; border: none; padding: 6vh 7vw; }
+    @page { size: 1280px 720px; margin: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 1 — Problem -->
+<section class="slide">
+  <div class="kicker">VeriFi · Bharat Agentic Hackathon 2026 · Slide 1</div>
+  <h1>UPI fraud is contextual manipulation —<br><span class="grad">the QR lies.</span></h1>
+  <ul>
+    <li>Indians lose <b>thousands of crores yearly</b> to scams that <b>look</b> legitimate</li>
+    <li>"Scan to receive ₹5000 cashback" → the QR quietly <b>DEBITS</b> you</li>
+    <li>Existing tools check URLs and blocklists — <b>nothing checks the narrative vs what the code actually does</b></li>
+  </ul>
+  <div class="foot"><span>VeriFi</span><span>1 / 7</span></div>
+</section>
+
+<!-- 2 — Insight -->
+<section class="slide">
+  <div class="kicker">The insight · Slide 2</div>
+  <h1><span class="grad">Intent ≠ Mechanism</span></h1>
+  <div class="cols">
+    <div class="box">
+      <h3>Narrative intent — what the message claims</h3>
+      <div class="big">"Scan this QR to RECEIVE ₹5000"</div>
+      <h3 style="margin-top:22px">Mechanism — what the QR actually does</h3>
+      <div class="big"><code>upi://pay?pa=scammer@okicici&amp;am=5000</code><br>→ <b style="color:var(--red)">DEBITS you</b></div>
+    </div>
+    <div>
+      <div class="vs">RECEIVE ≠ SEND</div>
+      <p style="font-size:clamp(18px,2vw,25px);padding-top:14px">
+        <b>Direct evidence of deception</b> — not a "suspicious vibe."</p>
+      <div class="quote">One screenshot. Two facts. The mechanism contradicts the narrative.</div>
+    </div>
+  </div>
+  <div class="foot"><span>VeriFi</span><span>2 / 7</span></div>
+</section>
+
+<!-- 3 — Solution -->
+<section class="slide">
+  <div class="kicker">Solution · Slide 3</div>
+  <h1>Evidence-driven agent —<br><span class="grad">math decides, LLM explains.</span></h1>
+  <ul>
+    <li>Deterministic <b>category-capped risk engine</b> (max 135, never says "safe")</li>
+    <li>Intent–Mechanism Mismatch carries the highest single weight: <span class="pill red">+40</span></li>
+    <li>Three genuine agentic loops: <span class="pill blue">clarify → ask</span><span class="pill blue">deep-scan → escalate</span><span class="pill blue">incident → interview</span></li>
+    <li>LLM explains <b>THE MATH</b> — <b>never overrides the score</b></li>
+  </ul>
+  <div class="foot"><span>VeriFi</span><span>3 / 7</span></div>
+</section>
+
+<!-- 4 — Architecture -->
+<section class="slide">
+  <div class="kicker">Architecture · Slide 4</div>
+  <h1>The three loops —<br><span class="grad">that's what "agentic" means.</span></h1>
+  <div class="loop"><div class="num">1</div><div class="txt">
+    Intent confidence &lt; 0.7 → <b>agent stops and ASKS YOU</b>: pay or receive? → re-plans with your answer</div></div>
+  <div class="loop"><div class="num">2</div><div class="txt">
+    Score 25–74 + evidence gap → <b>agent escalates tools autonomously</b> (deep URL scan, brand match) → re-scores</div></div>
+  <div class="loop"><div class="num">3</div><div class="txt">
+    "I got scammed" → <b>multi-turn interview</b> (one question per turn, checkpointer memory) → <b>personalized playbook</b></div></div>
+  <p style="margin-top:22px;color:var(--muted);font-size:clamp(15px,1.6vw,19px)">
+    Router → parallel evidence tools → deterministic risk engine → planner → <b style="color:var(--ink)">full decision trace on screen</b> — plan→act→observe→re-plan.</p>
+  <div class="foot"><span>VeriFi</span><span>4 / 7</span></div>
+</section>
+
+<!-- 5 — Demo results -->
+<section class="slide">
+  <div class="kicker">Measured results · Slide 5</div>
+  <h1>Fixture 1 trace + <span class="grad">30-scenario benchmark.</span></h1>
+  <div class="box" style="margin-bottom:8px">
+    <h3>Live trace — Fixture 1 (QR cashback scam)</h3>
+    <div style="font-family:Consolas,monospace;font-size:clamp(14px,1.5vw,18px);color:var(--muted)">
+      intent=<b style="color:var(--ink)">RECEIVE</b> · mechanism=<b style="color:var(--ink)">SEND</b>
+      → <span class="pill red">MISMATCH +40</span>
+      → <b style="color:var(--red)">105/135 CRITICAL</b> — in ~3 seconds, fully explained.</div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="n good">15/15</div><div class="l">scams flagged HIGH/CRITICAL</div></div>
+    <div class="stat"><div class="n good">0/10</div><div class="l">false positives on legit UPI</div></div>
+    <div class="stat"><div class="n good">3/3</div><div class="l">clarify-loop fired when expected</div></div>
+    <div class="stat"><div class="n good">5/5</div><div class="l">edge cases passed</div></div>
+  </div>
+  <p style="margin-top:18px;color:var(--muted)">Hermetic fixtures + cached API responses — <b style="color:var(--ink)">the demo cannot fail on stage.</b></p>
+  <div class="foot"><span>source: tests/eval_results.json</span><span>5 / 7</span></div>
+</section>
+
+<!-- 6 — Bharat impact -->
+<section class="slide">
+  <div class="kicker">Bharat impact · Slide 6</div>
+  <h1>From detection <span class="grad">to protection.</span></h1>
+  <ul>
+    <li><b>Hinglish-first:</b> Hindi/Hinglish detection, explanations routed to the user's language</li>
+    <li><b>Incident response playbook:</b> real <b>1930 / bank / cybercrime.gov.in</b> flow, personalized per victim (txn ID, bank, amount, time)</li>
+    <li><b>Zero false positives</b> on legitimate UPI transfers — 10/10 legit scenarios clean</li>
+    <li>Works hermetically — <b>no dependency on paid APIs</b> for the core verdict</li>
+  </ul>
+  <div class="stats">
+    <div class="stat"><div class="n">21</div><div class="l">scam taxonomy patterns (living dataset)</div></div>
+    <div class="stat"><div class="n">4/4</div><div class="l">fixtures: mismatch · lookalike · incident · legit</div></div>
+    <div class="stat"><div class="n">18/18</div><div class="l">tests green</div></div>
+  </div>
+  <div class="foot"><span>VeriFi</span><span>6 / 7</span></div>
+</section>
+
+<!-- 7 — Moat & future -->
+<section class="slide">
+  <div class="kicker">Moat &amp; future · Slide 7</div>
+  <h1>What others <span class="grad">can't copy quickly.</span></h1>
+  <ul>
+    <li><b>Taxonomy as a living dataset</b> — 10 → 21 patterns, grows with every reported scam</li>
+    <li><b>Mismatch engine</b> — a testable, deterministic deception signal competitors can't fake</li>
+    <li>Next: <b>WhatsApp bot delivery</b>, <b>bank API integration</b> for real-time txn verification</li>
+  </ul>
+  <div class="quote">Everything on this slide is real future work — nothing vaporware.</div>
+  <div class="stats">
+    <div class="stat" style="min-width:340px">
+      <div class="n grad" style="background:linear-gradient(90deg,var(--blue),var(--violet));
+        -webkit-background-clip:text;background-clip:text;color:transparent">VeriFi</div>
+      <div class="l">from detection to protection · Bharat Agentic Hackathon 2026</div>
+    </div>
+  </div>
+  <div class="foot"><span>Q&amp;A</span><span>7 / 7</span></div>
+</section>
+
+</body>
+</html>

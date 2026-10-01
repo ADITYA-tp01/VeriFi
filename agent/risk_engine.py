@@ -7,12 +7,8 @@ from __future__ import annotations
 CAPS = {"url": 50, "upi": 55, "social": 30}  # per-category ceilings
 
 
-def calculate_risk_score(ev: dict) -> tuple[int, str, list]:
-    """Score an evidence vector.
-
-    Returns (score, level, triggers) where triggers is a human-readable log
-    of applied points, tagging capped applications with [capped].
-    """
+def calculate_detailed(ev: dict) -> tuple[int, str, list, dict]:
+    """Full result: (score, level, triggers, per-category breakdown)."""
     cat = {"url": 0, "upi": 0, "social": 0}
     triggers = []
 
@@ -57,4 +53,13 @@ def calculate_risk_score(ev: dict) -> tuple[int, str, list]:
         level = "SUSPICIOUS"
     else:
         level = "NO_STRONG_INDICATORS"  # NEVER "safe"
+    return score, level, triggers, cat
+
+
+def calculate_risk_score(ev: dict) -> tuple[int, str, list]:
+    """Score an evidence vector (3-tuple contract used by tests/tools).
+
+    Returns (score, level, triggers); triggers tag capped points with [capped].
+    """
+    score, level, triggers, _ = calculate_detailed(ev)
     return score, level, triggers

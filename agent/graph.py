@@ -17,11 +17,12 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import Command, interrupt
 
+from agent.incident import INCIDENT_QUESTIONS, build_playbook, next_open_slot, normalize_answer
 from agent.mismatch import detect_mismatch
-from agent.risk_engine import calculate_risk_score
+from agent.risk_engine import calculate_detailed
 from agent.router import router_node
 from agent.state import AgentState
-from tools.intent_extractor import extract_intent
+from tools.intent_extractor import detect_hinglish, extract_intent
 from tools.qr_decoder import decode_qr, extract_mechanism
 from tools.url_intel import get_url_intel
 
@@ -122,14 +123,23 @@ def evidence_tools(state: AgentState) -> dict:
     if urls:
         url_ev = get_url_intel(urls[0], claimed_brand)
         for key in ("domain", "is_known_malicious", "brand_mismatch",
-                    "is_punycode_or_lookalike", "domain_age_days", "status"):
+                    "is_punycode_or_lookalike", "domain_age_days", "status",
+                    "urlscan_source", "urlscan_category"):
             if key in url_ev:
                 ev[key] = url_ev[key]
+        detail = (
+            f"{urls[0]} source={url_ev.get('source')} age={url_ev.get('domain_age_days')}d "
+            f"malicious={url_ev.get('is_known_malicious')} brand_mismatch={url_ev.get('brand_mismatch')}"
+        )
+        if url_ev.get("urlscan_source"):
+            detail += (
+                f" | urlscan={url_ev['urlscan_source']}"
+                f"{' (' + url_ev['urlscan_category'] + ')' if url_ev.get('urlscan_category') else ''}"
+            )
         trace.append({
             "node": "url_intel",
             "decision": url_ev.get("status", "OK"),
-            "detail": f"{urls[0]} source={url_ev.get('source')} age={url_ev.get('domain_age_days')}d "
-                      f"malicious={url_ev.get('is_known_malicious')} brand_mismatch={url_ev.get('brand_mismatch')}",
+            "detail": detail,
         })
 
     # ── Social engineering signals (deterministic keywords) ──
@@ -151,6 +161,15 @@ def evidence_tools(state: AgentState) -> dict:
             "detail": f"Matched {len(tax_hits)} pattern(s) in scam_taxonomy.json",
         })
 
+    # ── Language routing (Hinglish detection -> explainer switches language) ──
+    language = detect_hinglish(text)
+    if language == "hinglish":
+        trace.append({
+            "node": "language",
+            "decision": "hinglish",
+            "detail": "Hinglish/Hindi detected — explanation will be routed in Hinglish",
+        })
+
     # ── Evidence gaps the planner can see (a deeper tool could fill these) ──
     missing = []
     low_text = text.lower()
@@ -167,21 +186,24 @@ def evidence_tools(state: AgentState) -> dict:
         "clarify_needed": mm["clarify_needed"] and not clarify_answer,
         "clarify_question": mm["clarify_question"],
         "missing_slots": missing,
+        "language": language,
         "trace_log": trace,
     }
 
 
 def risk_engine_node(state: AgentState) -> dict:
     """Deterministic category-capped scoring — the engine decides, always."""
-    score, level, triggers = calculate_risk_score(state.get("evidence_vector") or {})
+    score, level, triggers, breakdown = calculate_detailed(state.get("evidence_vector") or {})
     return {
         "score": score,
         "risk_level": level,
         "triggers": triggers,
+        "score_breakdown": breakdown,
         "trace_log": [{
             "node": "risk_engine",
             "decision": f"{score} -> {level}",
-            "detail": "; ".join(triggers) if triggers else "no signals fired",
+            "detail": ("; ".join(triggers) if triggers else "no signals fired")
+                      + f" [url={breakdown['url']}/50 upi={breakdown['upi']}/55 social={breakdown['social']}/30]",
         }],
     }
 
@@ -266,12 +288,14 @@ def deep_scan_node(state: AgentState) -> dict:
 
 
 def explainer_node(state: AgentState) -> dict:
-    """LLM explains THE MATH — never overrides it. Deterministic fallback."""
+    """LLM explains THE MATH — never overrides it. Deterministic fallback.
+    Hinglish input -> explanation routed in Hinglish (Plan Part 1)."""
     score = state.get("score", 0)
     level = state.get("risk_level", "NO_STRONG_INDICATORS")
     triggers = state.get("triggers") or []
     intent = state.get("intent") or {}
     mechanism = state.get("mechanism") or {}
+    hinglish = state.get("language") == "hinglish"
 
     prompt = f"""You are VeriFi's explainer. Explain this risk assessment to an Indian UPI user.
 Score: {score}/135. Level: {level} (thresholds: 75+ CRITICAL, 50+ HIGH, 25+ SUSPICIOUS).
@@ -281,6 +305,8 @@ QR mechanism: {mechanism.get('action')}.
 Rules: explain WHY each point was awarded; NEVER change the score; NEVER say 'safe' —
 if level is NO_STRONG_INDICATORS say 'no strong indicators detected'. Keep under 120 words.
 End with a short action plan."""
+    if hinglish:
+        prompt += "\nThe user's message was in Hinglish — reply in Hinglish (Roman script, Hindi-English mix)."
 
     api_key = os.getenv("GROQ_API_KEY") or os.getenv("GROQ_API_KEY_BACKUP")
     explanation = None
@@ -301,46 +327,99 @@ End with a short action plan."""
 
     if not explanation:
         # Deterministic fallback — the math explained without an LLM
-        lines = [
-            f"VeriFi scored this {score}/135 -> {level} "
-            f"(thresholds: CRITICAL>=75, HIGH>=50, SUSPICIOUS>=25).",
-        ]
-        if triggers:
-            lines.append("Why: " + "; ".join(triggers) + ".")
-        else:
-            lines.append("Why: no strong indicators detected in the evidence.")
-        if state.get("intent_mechanism_mismatch"):
+        if hinglish:
+            lines = [
+                f"VeriFi ne is message ko evidence ke basis par {score}/135 score diya "
+                f"-> {level} (CRITICAL>=75, HIGH>=50, SUSPICIOUS>=25).",
+            ]
+            if triggers:
+                lines.append("Reasons: " + "; ".join(triggers) + ".")
+            else:
+                lines.append("Is evidence me koi strong indicator nahi mila — par "
+                             "dhyan rakhiye: ye proof nahi hai ki sab kuch theek hai.")
+            if state.get("intent_mechanism_mismatch"):
+                lines.append(
+                    "Sabse bada saboot: message kaha hai ki aap RECEIV karoge, par QR "
+                    "aapko DEBIT karega — ye seedha dhokha hai."
+                )
             lines.append(
-                "Key finding: the message claims you will RECEIVE money, but the QR "
-                "actually DEBITS you — direct evidence of deception."
+                "Action: koi QR scan mat kariye, koi payment mat kariye, aur doubt ho to "
+                "1930 par call kariye ya cybercrime.gov.in par report kariye."
             )
-        lines.append(
-            "Action plan: do not scan/pay; verify with the official bank app or call 1930."
-        )
-        explanation = " ".join(lines)
+            explanation = " ".join(lines)
+        else:
+            lines = [
+                f"VeriFi scored this {score}/135 -> {level} "
+                f"(thresholds: CRITICAL>=75, HIGH>=50, SUSPICIOUS>=25).",
+            ]
+            if triggers:
+                lines.append("Why: " + "; ".join(triggers) + ".")
+            else:
+                lines.append("Why: no strong indicators detected in the evidence.")
+            if state.get("intent_mechanism_mismatch"):
+                lines.append(
+                    "Key finding: the message claims you will RECEIVE money, but the QR "
+                    "actually DEBITS you — direct evidence of deception."
+                )
+            lines.append(
+                "Action plan: do not scan/pay; verify with the official bank app or call 1930."
+            )
+            explanation = " ".join(lines)
 
     return {
         "explanation": explanation,
         "trace_log": [{
             "node": "explainer",
-            "decision": "explained",
+            "decision": "explained (hinglish)" if hinglish else "explained",
             "detail": "LLM explains the engine's math — score unchanged (never overridden)",
         }],
     }
 
 
-def incident_node(state: AgentState) -> dict:
-    """INCIDENT branch stub — full interview lands in Tier 2 with checkpointer memory."""
+def incident_interview_node(state: AgentState) -> dict:
+    """Loop 3 — interview the victim ONE question at a time (checkpointer memory).
+
+    Each invoke with Command(resume=...) fills exactly one slot, then the
+    conditional edge loops back here until all slots are filled.
+    """
+    slots = dict(state.get("incident_slots") or {})
+    open_slot = next_open_slot(slots)
+    if open_slot is None:
+        return {"incident_slots": slots}  # defensive: all filled -> playbook
+
+    key, question = open_slot
+    answer = interrupt(question)
+    slots[key] = normalize_answer(answer)
     return {
-        "explanation": (
-            "Incident mode: the full multi-turn interview (txn ID → bank → amount → time) "
-            "and personalized 1930/cybercrime.gov.in playbook arrive in Tier 2. "
-            "Meanwhile: call 1930 immediately and contact your bank's fraud desk."
-        ),
+        "incident_slots": slots,
         "trace_log": [{
-            "node": "incident",
-            "decision": "interview (Tier 2 stub)",
-            "detail": "Router selected INCIDENT mode — playbook stub returned",
+            "node": "incident_interview",
+            "decision": f"{key} = {slots[key]}",
+            "detail": f"Q{len(INCIDENT_QUESTIONS) - sum(1 for k, _ in INCIDENT_QUESTIONS if k in slots) + 1}"
+                      f"/{len(INCIDENT_QUESTIONS)}: {question} | A: {answer}",
+        }],
+    }
+
+
+def incident_decision(state: AgentState) -> str:
+    """All slots filled -> playbook; otherwise ask the next question."""
+    slots = state.get("incident_slots") or {}
+    if next_open_slot(slots) is None:
+        return "playbook"
+    return "interview"
+
+
+def playbook_node(state: AgentState) -> dict:
+    """Personalized recovery playbook built from the victim's own answers."""
+    slots = state.get("incident_slots") or {}
+    playbook = build_playbook(slots)
+    return {
+        "playbook": playbook,
+        "explanation": "Interview complete — your personalized recovery playbook is ready below.",
+        "trace_log": [{
+            "node": "playbook",
+            "decision": "personalized",
+            "detail": f"Playbook generated from slots: {slots}",
         }],
     }
 
@@ -356,13 +435,14 @@ def build_graph():
     g.add_node("clarify_node", clarify_node)
     g.add_node("deep_scan_node", deep_scan_node)
     g.add_node("explainer_node", explainer_node)
-    g.add_node("incident_node", incident_node)
+    g.add_node("incident_interview", incident_interview_node)
+    g.add_node("playbook_node", playbook_node)
 
     g.add_edge(START, "router")
     g.add_conditional_edges(
         "router",
         lambda s: "incident" if s.get("mode") == "INCIDENT" else "analyze",
-        {"analyze": "evidence_tools", "incident": "incident_node"},
+        {"analyze": "evidence_tools", "incident": "incident_interview"},
     )
     g.add_edge("evidence_tools", "risk_engine")
     g.add_edge("risk_engine", "planner")
@@ -378,7 +458,13 @@ def build_graph():
     g.add_edge("clarify_node", "evidence_tools")   # re-plan with new info
     g.add_edge("deep_scan_node", "risk_engine")    # re-score with new evidence
     g.add_edge("explainer_node", END)
-    g.add_edge("incident_node", END)
+    # Incident branch: interview loops until all slots filled -> playbook
+    g.add_conditional_edges(
+        "incident_interview",
+        incident_decision,
+        {"interview": "incident_interview", "playbook": "playbook_node"},
+    )
+    g.add_edge("playbook_node", END)
 
     return g.compile(checkpointer=MemorySaver())
 

@@ -121,10 +121,12 @@ def test_deep_scan_loop_on_borderline_score():
 
 
 def test_incident_router():
-    """Router classifies incident reports -> incident branch answers."""
+    """Router classifies incident reports -> incident interview begins (Tier 2)."""
     result = app.invoke({"user_input": "I got scammed yesterday, money was deducted"}, _config())
     assert result["mode"] == "INCIDENT"
-    assert "1930" in result.get("explanation", "")
+    # Interview starts — first question asks for the transaction ID
+    assert "__interrupt__" in result
+    assert "transaction id" in result["__interrupt__"][0].value.lower()
 
 
 def test_explanation_never_says_safe():

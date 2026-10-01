@@ -76,6 +76,71 @@ def _live_whois(domain: str) -> dict:
         return {"status": "UNVERIFIED", "reason": f"domain {domain} does not resolve"}
 
 
+def _urlscan_cache_lookup(domain: str) -> dict | None:
+    f = CACHE_DIR / f"urlscan_{domain}.json"
+    if not f.exists():
+        return None
+    try:
+        return json.loads(f.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def _live_urlscan(url: str) -> dict | None:
+    """Live urlscan.io submit+poll — only when LIVE=1 AND URLSCAN_API_KEY set.
+
+    Uses stdlib urllib (no extra dependency). Returns the verdict dict, a
+    QUEUED marker, or None on any failure — never raises.
+    """
+    if not _live_enabled():
+        return None
+    key = os.getenv("URLSCAN_API_KEY", "").strip()
+    if not key:
+        return None
+    try:
+        import time
+        import urllib.request
+
+        req = urllib.request.Request(
+            "https://urlscan.io/api/v1/scan/",
+            data=json.dumps({"url": url, "visibility": "public"}).encode(),
+            headers={"API-Key": key, "Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            submitted = json.loads(resp.read().decode())
+        scan_uuid = submitted.get("uuid")
+        if not scan_uuid:
+            return None
+        for _ in range(3):
+            time.sleep(2)
+            poll = urllib.request.Request(
+                f"https://urlscan.io/api/v1/result/{scan_uuid}/",
+                headers={"API-Key": key},
+            )
+            try:
+                with urllib.request.urlopen(poll, timeout=5) as resp:
+                    result = json.loads(resp.read().decode())
+                result["source"] = "live_urlscan"
+                return result
+            except OSError:
+                continue
+        return {"status": "QUEUED", "source": "live_urlscan"}
+    except Exception:
+        return None
+
+
+def get_urlscan_verdict(url: str) -> dict | None:
+    """urlscan.io verdict — cached first; live only behind LIVE=1 + API key."""
+    domain = _extract_domain(url)
+    cached = _urlscan_cache_lookup(domain)
+    if cached is not None:
+        cached = dict(cached)
+        cached["source"] = f"cache_urlscan:{domain}"
+        return cached
+    return _live_urlscan(url)
+
+
 def _is_official(domain: str, brand_key: str) -> bool:
     """True if the domain is the brand's genuine registered domain."""
     official = OFFICIAL_DOMAINS.get(brand_key, [])
@@ -129,4 +194,18 @@ def get_url_intel(url: str, claimed_brand: str | None = None) -> dict:
     evidence["is_punycode_or_lookalike"] = _is_punycode_or_lookalike(
         domain, claimed_brand
     )
+
+    # urlscan.io verdict (cache-first; live only behind LIVE=1 + URLSCAN_API_KEY).
+    # OR-ed into is_known_malicious — a second source for the SAME +50 signal,
+    # never a separate additive point.
+    verdict = get_urlscan_verdict(url)
+    if verdict:
+        evidence["urlscan_source"] = verdict.get("source", "unknown")
+        overall = (verdict.get("verdicts") or {}).get("overall") or {}
+        if overall.get("malicious"):
+            evidence["is_known_malicious"] = True
+            evidence["urlscan_status"] = "malicious"
+        cats = (verdict.get("lists") or {}).get("categories") or []
+        if cats:
+            evidence["urlscan_category"] = ",".join(str(c) for c in cats)
     return evidence

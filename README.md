@@ -33,12 +33,12 @@ VeriFi extracts both and compares them. A mismatch is **direct evidence of decep
     [ PARALLEL EVIDENCE TOOLS ]                [ INCIDENT INTERVIEW ]
      T1 URL Intel · T2 QR Decode                 Multi-turn slot-filling
      T3 Scam Taxonomy KB                         one question per turn
-               │                                 (Tier 2, checkpointer)
+               │                                 (MemorySaver checkpointer)
                ▼                                          │
     [ DETERMINISTIC RISK ENGINE ]                         ▼
      Category-capped scoring                    [ PLAYBOOK GENERATOR ]
                │                                 1930 / bank / cybercrime.gov.in
-               ▼
+               ▼                                 personalized to their answers
     [ AGENT PLANNER NODE ]  ◄── THE BRAIN
      ├─► Intent ambiguous?   ──► [ CLARIFY NODE ]    ── asks user ──► loop back
      ├─► Score 25–74 + gap?  ──► [ DEEP SCAN NODE ]  ── re-score ──► loop back
@@ -51,7 +51,7 @@ VeriFi extracts both and compares them. A mismatch is **direct evidence of decep
 ### The three loops (what makes it *agentic*, not a wrapper)
 1. **Clarify:** intent confidence < 0.7 → the agent *stops and asks* "pay or receive?", then re-plans with the answer.
 2. **Deep scan:** borderline score (25–74) + evidence gap → the agent *autonomously* runs deeper tools, re-scores, re-plans.
-3. **Incident interview (Tier 2):** victim is interviewed one question at a time; the recovery playbook is personalized from their answers. Memory via LangGraph `MemorySaver`.
+3. **Incident interview:** victim is interviewed one question at a time (txn ID → bank → amount → time); the recovery playbook is personalized from their answers. Memory across turns via LangGraph `MemorySaver`.
 
 ---
 
@@ -115,8 +115,8 @@ clarify-loop fired on 3/3 expected cases
 
 ```
 agent/            graph.py (nodes + conditional edges), risk_engine.py, state.py,
-                  router.py, mismatch.py
-tools/            qr_decoder.py, url_intel.py, intent_extractor.py
+                  router.py, mismatch.py, incident.py (interview + playbook)
+tools/            qr_decoder.py, url_intel.py, intent_extractor.py (incl. Hinglish detection)
 data/fixtures/    4 fixture packs + cached_api/ (WHOIS & urlscan JSONs)
 data/             scam_taxonomy.json (10 patterns -> 20+ in Tier 2)
 tests/            test_tier1_gate.py, eval_set.json (30), run_eval.py

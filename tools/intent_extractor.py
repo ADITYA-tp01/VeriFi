@@ -17,12 +17,40 @@ RECEIVE_WORDS = [
     "receive", "receiv", "get", "getting", "cashback", "refund", "prize",
     "winner", "won", "credit", "credited", "paid to you", "money back",
     "refund mil", "paisa milega", "cashback milega",
+    # Hinglish receive cues
+    "milega", "mil jayega", "mil gaya", "jeet gaye", "jeeta", "prapt",
 ]
 SEND_WORDS = [
     "pay", "payment", "send", "debit", "scan to pay", "scan karo",
     "transfer", "recharge", "upgrade", "fee", "verify account",
     "pay now", "jaldi pay",
+    # Hinglish send cues
+    "bhejo", "bhej do", "bhejo", "jama karo", "send karo", "pay karo",
+    "paisa bhejo", "kardo", "kar do",
 ]
+
+# Hinglish markers for language routing (word-boundary matched)
+HINGLISH_MARKERS = [
+    "kya", "karo", "hai", "aapko", "tumhe", "tum", "warna", "turant",
+    "paisa", "milega", "chahiye", "jaldi", "batao", "krna", "karna",
+    "kyu", "kyon", "abhi", "acha", "theek", "nahi", "bilkul", "raha",
+    "rahi", "hoon", "kaise", "karke", "seedhe", "mat", "ho", "rahe",
+    "chuka", "liya", "dena", "lena", "bolo", "suno", "dekho", "lo",
+]
+
+
+def detect_hinglish(text: str) -> str:
+    """Return "hinglish" if the text is Hindi/Hinglish, else "en".
+
+    Devanagari script is an immediate yes; romanized Hinglish needs >= 2 markers.
+    """
+    if not text:
+        return "en"
+    if re.search(r"[\u0900-\u097F]", text):
+        return "hinglish"
+    words = set(re.findall(r"[a-z]+", text.lower()))
+    hits = sum(1 for m in HINGLISH_MARKERS if m in words)
+    return "hinglish" if hits >= 2 else "en"
 
 SYSTEM_PROMPT = """You classify the NARRATIVE INTENT of a message in an Indian UPI context.
 Categories: RECEIVE_MONEY (message claims the user will GET money), SEND_MONEY (message asks the user to PAY), NEUTRAL.
