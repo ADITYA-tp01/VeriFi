@@ -1,0 +1,6 @@
+{
+  "status": "OK",
+  "domain": "loan-approval-app.com",
+  "domain_age_days": 6,
+  "is_known_malicious": true
+}

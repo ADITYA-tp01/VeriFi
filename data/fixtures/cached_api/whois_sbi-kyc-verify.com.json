@@ -1,0 +1,6 @@
+{
+  "status": "OK",
+  "domain": "sbi-kyc-verify.com",
+  "domain_age_days": 3,
+  "is_known_malicious": false
+}

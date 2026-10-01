@@ -1,0 +1,219 @@
+{
+  "version": "1.0",
+  "created": "Phase 0 pre-flight (Kimi)",
+  "note": "30 scenarios: 15 scam, 10 legitimate, 5 edge. Hermetic — every URL domain has a cached WHOIS response in data/fixtures/cached_api/. Run: python tests/run_eval.py",
+  "scenarios": [
+    {
+      "id": "scam_01_kyc_phish",
+      "type": "scam",
+      "name": "KYC phishing with lookalike URL",
+      "input": {"text": "From SBI: Your account will be blocked today. Update KYC immediately at https://sbi-kyc-verify.com", "qr_payload": null},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false}
+    },
+    {
+      "id": "scam_02_digital_arrest",
+      "type": "scam",
+      "name": "Digital arrest (CBI impersonation)",
+      "input": {"text": "You are under digital arrest by CBI for money laundering. Pay Rs.50000 via http://cyber-cell-release.in immediately to clear the case or you will be arrested.", "qr_payload": null},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false}
+    },
+    {
+      "id": "scam_03_fake_buyer_qr",
+      "type": "scam",
+      "name": "Fake buyer QR (scan to receive)",
+      "input": {"text": "Scan this QR to receive Rs.5000 cashback today. Reply immediately for the offer.", "qr_payload": "upi://pay?pa=cashback@okaxis&am=5000&tn=Offer"},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false, "mismatch": true}
+    },
+    {
+      "id": "scam_04_task_scam",
+      "type": "scam",
+      "name": "Task / earning app scam",
+      "input": {"text": "Earn Rs.5000 daily from home. Deposit Rs.999 to start at http://daily-earn-app.com - guaranteed returns!", "qr_payload": null},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false}
+    },
+    {
+      "id": "scam_05_otp_theft",
+      "type": "scam",
+      "name": "OTP theft via fake refund",
+      "input": {"text": "Share your OTP to confirm the Rs.1 refund at http://verify-upi.in or your account will be blocked.", "qr_payload": null},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false}
+    },
+    {
+      "id": "scam_06_customs_parcel",
+      "type": "scam",
+      "name": "Customs parcel fee scam",
+      "input": {"text": "Your parcel is stuck in customs. Pay the customs fee of Rs.2500 at http://customs-clearance.in within 24 hours or it will be returned.", "qr_payload": null},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false}
+    },
+    {
+      "id": "scam_07_loan_blackmail",
+      "type": "scam",
+      "name": "Loan app extortion",
+      "input": {"text": "Your loan is approved. Pay the processing fee within 24 hours at http://loan-approval-app.com or we will morph your photos and send them to your contacts.", "qr_payload": null},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false}
+    },
+    {
+      "id": "scam_08_fake_official",
+      "type": "scam",
+      "name": "Fake regulator notice (SBI impersonation)",
+      "input": {"text": "From SBI: PAN-Aadhaar linking will be suspended. Verify at https://sbi-notice-verify.com immediately.", "qr_payload": null},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false}
+    },
+    {
+      "id": "scam_09_romance_stranded",
+      "type": "scam",
+      "name": "Romance / stranded-abroad scam",
+      "input": {"text": "I am stranded abroad. Please send $200 via http://help-me-return.com to book my flight home. I love you.", "qr_payload": null},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false}
+    },
+    {
+      "id": "scam_10_overpayment_qr",
+      "type": "scam",
+      "name": "Overpayment refund trick via QR",
+      "input": {"text": "A buyer accidentally sent you extra Rs.8000. Scan this QR immediately to refund the difference before they complain.", "qr_payload": "upi://pay?pa=buyer@oksbi&am=8000&tn=Refund"},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false, "mismatch": true}
+    },
+    {
+      "id": "scam_11_smishing_phish",
+      "type": "scam",
+      "name": "Bank smishing (HDFC impersonation)",
+      "input": {"text": "HDFC: Your a/c XX8842 will be suspended. Verify at http://hdfc-secure-login.in now.", "qr_payload": null},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false}
+    },
+    {
+      "id": "scam_12_collect_fraud",
+      "type": "scam",
+      "name": "Fake UPI collect request",
+      "input": {"text": "Approve this request to receive Rs.20000. Details: http://upi-collect-info.com", "qr_payload": "upi://collect?pa=merchant@ybl&am=20000"},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false}
+    },
+    {
+      "id": "scam_13_charity_festival",
+      "type": "scam",
+      "name": "Festival charity scam",
+      "input": {"text": "This Diwali, donate Rs.501 to double your karma - send to our fund at http://diwali-fund.org. Festival offer ends tonight!", "qr_payload": null},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false}
+    },
+    {
+      "id": "scam_14_bijli_hinglish",
+      "type": "scam",
+      "name": "Electricity bill scam (Hinglish)",
+      "input": {"text": "Bijli bill pending hai, turant pay karo warna light kat jayegi. Pay at http://bijli-bill-pay.in", "qr_payload": null},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false}
+    },
+    {
+      "id": "scam_15_sim_swap",
+      "type": "scam",
+      "name": "SIM swap / OTP phishing",
+      "input": {"text": "Final notice: your SIM will be deactivated. Share OTP now and click http://sim-reverify.com to reverify within 24 hours.", "qr_payload": null},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false}
+    },
+
+    {
+      "id": "legit_01_friend_transfer",
+      "type": "legit",
+      "name": "Friend sends money (payment received)",
+      "input": {"text": "Payment received! Rahul sent you Rs. 500 for movie tickets. UPI Ref: 412365897452. Your HDFC Bank a/c XX4821 is updated.", "qr_payload": null},
+      "expect": {"level_in": ["NO_STRONG_INDICATORS"], "clarify": false}
+    },
+    {
+      "id": "legit_02_bank_debit_alert",
+      "type": "legit",
+      "name": "Bank debit alert SMS",
+      "input": {"text": "Rs.1,299.00 debited from HDFC A/c XX4821 on 01-Oct-26. Balance Rs.24,510. Not you? Call 18602676161.", "qr_payload": null},
+      "expect": {"level_in": ["NO_STRONG_INDICATORS"], "clarify": false}
+    },
+    {
+      "id": "legit_03_salary_credit",
+      "type": "legit",
+      "name": "Salary credit alert",
+      "input": {"text": "Salary credited: Rs.85,000.00 in A/c XX9902 on 30-Sep-26. Avail pre-approved loan offer, T&C apply.", "qr_payload": null},
+      "expect": {"level_in": ["NO_STRONG_INDICATORS"], "clarify": false}
+    },
+    {
+      "id": "legit_04_merchant_paid",
+      "type": "legit",
+      "name": "Merchant payment confirmation",
+      "input": {"text": "Paid Rs.340 to Sharma Kirana via UPI Ref 309876543210.", "qr_payload": null},
+      "expect": {"level_in": ["NO_STRONG_INDICATORS"], "clarify": false}
+    },
+    {
+      "id": "legit_05_recharge_confirmation",
+      "type": "legit",
+      "name": "Mobile recharge confirmation",
+      "input": {"text": "Rs.239 plan recharged successfully for 9876543210. Valid till 21-Oct-26.", "qr_payload": null},
+      "expect": {"level_in": ["NO_STRONG_INDICATORS"], "clarify": false}
+    },
+    {
+      "id": "legit_06_bank_kyc_reminder",
+      "type": "legit",
+      "name": "Genuine bank KYC reminder with urgency",
+      "input": {"text": "Update your KYC by 30-Nov-26 or your account will be blocked. -HDFC Bank", "qr_payload": null},
+      "expect": {"level_in": ["NO_STRONG_INDICATORS"], "clarify": false}
+    },
+    {
+      "id": "legit_07_split_bill_request",
+      "type": "legit",
+      "name": "Friend requests bill split",
+      "input": {"text": "Can you send your share of Rs.750 for dinner whenever free? UPI: nitin@okicici", "qr_payload": null},
+      "expect": {"level_in": ["NO_STRONG_INDICATORS"], "clarify": false}
+    },
+    {
+      "id": "legit_08_cashback_credit",
+      "type": "legit",
+      "name": "Official cashback credit",
+      "input": {"text": "Cashback of Rs.100 credited to your account by Paytm. Enjoy!", "qr_payload": null},
+      "expect": {"level_in": ["NO_STRONG_INDICATORS"], "clarify": false}
+    },
+    {
+      "id": "legit_09_official_url",
+      "type": "legit",
+      "name": "Bank message with official URL",
+      "input": {"text": "HDFC Bank: Statement for A/c XX1122 is ready at https://www.hdfcbank.com/statement. Login to view.", "qr_payload": null},
+      "expect": {"level_in": ["NO_STRONG_INDICATORS"], "clarify": false}
+    },
+    {
+      "id": "legit_10_rent_transfer",
+      "type": "legit",
+      "name": "Rent transfer confirmation",
+      "input": {"text": "Rent of Rs.22,000 transferred to landlord via UPI on 01-Oct-26.", "qr_payload": null},
+      "expect": {"level_in": ["NO_STRONG_INDICATORS"], "clarify": false}
+    },
+
+    {
+      "id": "edge_01_hinglish_qr_mismatch",
+      "type": "edge",
+      "name": "Hinglish cashback QR with mismatch",
+      "input": {"text": "Kya aapko cashback chahiye? Is QR ko scan karo aur paisa receive karo - turant!", "qr_payload": "upi://pay?pa=bonus@okhdfcbank&am=2000&tn=Cashback"},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false, "mismatch": true}
+    },
+    {
+      "id": "edge_02_ambiguous_qr",
+      "type": "edge",
+      "name": "Ambiguous narrative + pay QR -> must clarify",
+      "input": {"text": "Complete the pending process. Reply to proceed.", "qr_payload": "upi://pay?pa=mystery@ybl&am=999"},
+      "expect": {"clarify": true, "clarify_answer": "pay"}
+    },
+    {
+      "id": "edge_03_punycode_lookalike",
+      "type": "edge",
+      "name": "Punycode lookalike domain",
+      "input": {"text": "Login to your SBI account at https://xn--sbi-verify-9cb.com immediately or your account will be blocked.", "qr_payload": null},
+      "expect": {"level_in": ["HIGH", "CRITICAL"], "clarify": false}
+    },
+    {
+      "id": "edge_04_ambiguous_collect_qr",
+      "type": "edge",
+      "name": "Ambiguous narrative + collect QR -> must clarify",
+      "input": {"text": "Please handle this carefully. Verify to continue.", "qr_payload": "upi://collect?pa=friend@okicici&am=500"},
+      "expect": {"clarify": true, "clarify_answer": "receive"}
+    },
+    {
+      "id": "edge_05_mixed_cues_qr",
+      "type": "edge",
+      "name": "Mixed send/receive cues + pay QR -> clarify, then flag",
+      "input": {"text": "You will receive Rs.2000 or make the payment, whichever applies. Scan to continue.", "qr_payload": "upi://pay?pa=confused@okaxis&am=2000"},
+      "expect": {"clarify": true, "clarify_answer": "receive", "level_in_after": ["SUSPICIOUS", "HIGH", "CRITICAL"], "mismatch_after": true}
+    }
+  ]
+}

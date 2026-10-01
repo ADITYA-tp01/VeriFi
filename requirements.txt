@@ -1,0 +1,8 @@
+langgraph
+streamlit
+opencv-python-headless
+qrcode
+pillow
+groq
+python-dotenv
+tldextract

@@ -1,0 +1,408 @@
+{
+  "summary": {
+    "scams_high_critical": "15/15",
+    "scams_any_flag": "15/15",
+    "legit_false_positives": "0/10",
+    "clarify_expected": "3/3",
+    "edge_passed": "5/5",
+    "total_passed": "30/30"
+  },
+  "confusion_matrix": {
+    "tp": 15,
+    "fn": 0,
+    "fp": 0,
+    "tn": 10
+  },
+  "rows": [
+    {
+      "id": "scam_01_kyc_phish",
+      "type": "scam",
+      "name": "KYC phishing with lookalike URL",
+      "score": 65,
+      "level": "HIGH",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [
+        "+25 Brand impersonation (text says 'SBI', domain isn't)",
+        "+25 Lookalike/punycode domain [capped]",
+        "+15 Urgency/threat language"
+      ],
+      "pass": true
+    },
+    {
+      "id": "scam_02_digital_arrest",
+      "type": "scam",
+      "name": "Digital arrest (CBI impersonation)",
+      "score": 65,
+      "level": "HIGH",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [
+        "+50 Known malicious domain",
+        "+15 Urgency/threat language"
+      ],
+      "pass": true
+    },
+    {
+      "id": "scam_03_fake_buyer_qr",
+      "type": "scam",
+      "name": "Fake buyer QR (scan to receive)",
+      "score": 55,
+      "level": "HIGH",
+      "clarify_fired": false,
+      "mismatch": true,
+      "triggers": [
+        "+40 CRITICAL: claims RECEIVE, QR actually DEBITS",
+        "+15 Urgency/threat language"
+      ],
+      "pass": true
+    },
+    {
+      "id": "scam_04_task_scam",
+      "type": "scam",
+      "name": "Task / earning app scam",
+      "score": 50,
+      "level": "HIGH",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [
+        "+50 Known malicious domain"
+      ],
+      "pass": true
+    },
+    {
+      "id": "scam_05_otp_theft",
+      "type": "scam",
+      "name": "OTP theft via fake refund",
+      "score": 80,
+      "level": "CRITICAL",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [
+        "+50 Known malicious domain",
+        "+15 Urgency/threat language",
+        "+15 Requests OTP/PIN/credentials [capped]"
+      ],
+      "pass": true
+    },
+    {
+      "id": "scam_06_customs_parcel",
+      "type": "scam",
+      "name": "Customs parcel fee scam",
+      "score": 65,
+      "level": "HIGH",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [
+        "+50 Known malicious domain",
+        "+15 Urgency/threat language"
+      ],
+      "pass": true
+    },
+    {
+      "id": "scam_07_loan_blackmail",
+      "type": "scam",
+      "name": "Loan app extortion",
+      "score": 65,
+      "level": "HIGH",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [
+        "+50 Known malicious domain",
+        "+15 Urgency/threat language"
+      ],
+      "pass": true
+    },
+    {
+      "id": "scam_08_fake_official",
+      "type": "scam",
+      "name": "Fake regulator notice (SBI impersonation)",
+      "score": 65,
+      "level": "HIGH",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [
+        "+25 Brand impersonation (text says 'SBI', domain isn't)",
+        "+25 Lookalike/punycode domain [capped]",
+        "+15 Urgency/threat language"
+      ],
+      "pass": true
+    },
+    {
+      "id": "scam_09_romance_stranded",
+      "type": "scam",
+      "name": "Romance / stranded-abroad scam",
+      "score": 50,
+      "level": "HIGH",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [
+        "+50 Known malicious domain"
+      ],
+      "pass": true
+    },
+    {
+      "id": "scam_10_overpayment_qr",
+      "type": "scam",
+      "name": "Overpayment refund trick via QR",
+      "score": 55,
+      "level": "HIGH",
+      "clarify_fired": false,
+      "mismatch": true,
+      "triggers": [
+        "+40 CRITICAL: claims RECEIVE, QR actually DEBITS",
+        "+15 Urgency/threat language"
+      ],
+      "pass": true
+    },
+    {
+      "id": "scam_11_smishing_phish",
+      "type": "scam",
+      "name": "Bank smishing (HDFC impersonation)",
+      "score": 65,
+      "level": "HIGH",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [
+        "+25 Brand impersonation (text says 'SBI', domain isn't)",
+        "+25 Lookalike/punycode domain [capped]",
+        "+15 Urgency/threat language"
+      ],
+      "pass": true
+    },
+    {
+      "id": "scam_12_collect_fraud",
+      "type": "scam",
+      "name": "Fake UPI collect request",
+      "score": 65,
+      "level": "HIGH",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [
+        "+50 Known malicious domain",
+        "+15 UPI collection request"
+      ],
+      "pass": true
+    },
+    {
+      "id": "scam_13_charity_festival",
+      "type": "scam",
+      "name": "Festival charity scam",
+      "score": 50,
+      "level": "HIGH",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [
+        "+50 Known malicious domain"
+      ],
+      "pass": true
+    },
+    {
+      "id": "scam_14_bijli_hinglish",
+      "type": "scam",
+      "name": "Electricity bill scam (Hinglish)",
+      "score": 65,
+      "level": "HIGH",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [
+        "+50 Known malicious domain",
+        "+15 Urgency/threat language"
+      ],
+      "pass": true
+    },
+    {
+      "id": "scam_15_sim_swap",
+      "type": "scam",
+      "name": "SIM swap / OTP phishing",
+      "score": 80,
+      "level": "CRITICAL",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [
+        "+50 Known malicious domain",
+        "+15 Urgency/threat language",
+        "+15 Requests OTP/PIN/credentials [capped]"
+      ],
+      "pass": true
+    },
+    {
+      "id": "legit_01_friend_transfer",
+      "type": "legit",
+      "name": "Friend sends money (payment received)",
+      "score": 0,
+      "level": "NO_STRONG_INDICATORS",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [],
+      "pass": true
+    },
+    {
+      "id": "legit_02_bank_debit_alert",
+      "type": "legit",
+      "name": "Bank debit alert SMS",
+      "score": 0,
+      "level": "NO_STRONG_INDICATORS",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [],
+      "pass": true
+    },
+    {
+      "id": "legit_03_salary_credit",
+      "type": "legit",
+      "name": "Salary credit alert",
+      "score": 0,
+      "level": "NO_STRONG_INDICATORS",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [],
+      "pass": true
+    },
+    {
+      "id": "legit_04_merchant_paid",
+      "type": "legit",
+      "name": "Merchant payment confirmation",
+      "score": 0,
+      "level": "NO_STRONG_INDICATORS",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [],
+      "pass": true
+    },
+    {
+      "id": "legit_05_recharge_confirmation",
+      "type": "legit",
+      "name": "Mobile recharge confirmation",
+      "score": 0,
+      "level": "NO_STRONG_INDICATORS",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [],
+      "pass": true
+    },
+    {
+      "id": "legit_06_bank_kyc_reminder",
+      "type": "legit",
+      "name": "Genuine bank KYC reminder with urgency",
+      "score": 15,
+      "level": "NO_STRONG_INDICATORS",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [
+        "+15 Urgency/threat language"
+      ],
+      "pass": true
+    },
+    {
+      "id": "legit_07_split_bill_request",
+      "type": "legit",
+      "name": "Friend requests bill split",
+      "score": 0,
+      "level": "NO_STRONG_INDICATORS",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [],
+      "pass": true
+    },
+    {
+      "id": "legit_08_cashback_credit",
+      "type": "legit",
+      "name": "Official cashback credit",
+      "score": 0,
+      "level": "NO_STRONG_INDICATORS",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [],
+      "pass": true
+    },
+    {
+      "id": "legit_09_official_url",
+      "type": "legit",
+      "name": "Bank message with official URL",
+      "score": 0,
+      "level": "NO_STRONG_INDICATORS",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [],
+      "pass": true
+    },
+    {
+      "id": "legit_10_rent_transfer",
+      "type": "legit",
+      "name": "Rent transfer confirmation",
+      "score": 0,
+      "level": "NO_STRONG_INDICATORS",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [],
+      "pass": true
+    },
+    {
+      "id": "edge_01_hinglish_qr_mismatch",
+      "type": "edge",
+      "name": "Hinglish cashback QR with mismatch",
+      "score": 55,
+      "level": "HIGH",
+      "clarify_fired": false,
+      "mismatch": true,
+      "triggers": [
+        "+40 CRITICAL: claims RECEIVE, QR actually DEBITS",
+        "+15 Urgency/threat language"
+      ],
+      "pass": true
+    },
+    {
+      "id": "edge_02_ambiguous_qr",
+      "type": "edge",
+      "name": "Ambiguous narrative + pay QR -> must clarify",
+      "score": 0,
+      "level": "NO_STRONG_INDICATORS",
+      "clarify_fired": true,
+      "mismatch": false,
+      "triggers": [],
+      "pass": true
+    },
+    {
+      "id": "edge_03_punycode_lookalike",
+      "type": "edge",
+      "name": "Punycode lookalike domain",
+      "score": 65,
+      "level": "HIGH",
+      "clarify_fired": false,
+      "mismatch": false,
+      "triggers": [
+        "+25 Brand impersonation (text says 'SBI', domain isn't)",
+        "+25 Lookalike/punycode domain [capped]",
+        "+15 Urgency/threat language"
+      ],
+      "pass": true
+    },
+    {
+      "id": "edge_04_ambiguous_collect_qr",
+      "type": "edge",
+      "name": "Ambiguous narrative + collect QR -> must clarify",
+      "score": 15,
+      "level": "NO_STRONG_INDICATORS",
+      "clarify_fired": true,
+      "mismatch": false,
+      "triggers": [
+        "+15 UPI collection request"
+      ],
+      "pass": true
+    },
+    {
+      "id": "edge_05_mixed_cues_qr",
+      "type": "edge",
+      "name": "Mixed send/receive cues + pay QR -> clarify, then flag",
+      "score": 40,
+      "level": "SUSPICIOUS",
+      "clarify_fired": true,
+      "mismatch": true,
+      "triggers": [
+        "+40 CRITICAL: claims RECEIVE, QR actually DEBITS"
+      ],
+      "pass": true
+    }
+  ]
+}

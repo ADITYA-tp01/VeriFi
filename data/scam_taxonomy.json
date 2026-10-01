@@ -1,0 +1,81 @@
+{
+  "version": "1.0-seed",
+  "note": "Seed of 10 patterns — Qwen expands to 20+ in Tier 2.",
+  "patterns": [
+    {
+      "id": "kyc_fraud",
+      "name": "KYC / Account Block Fraud",
+      "signals": ["kyc", "update kyc", "account will be blocked", "aadhaar", "pan card verification"],
+      "urgency": true,
+      "asks_money": false
+    },
+    {
+      "id": "digital_arrest",
+      "name": "Digital Arrest",
+      "signals": ["digital arrest", "you are under surveillance", "cbi", "customs", "police case", "warrant"],
+      "urgency": true,
+      "asks_money": false
+    },
+    {
+      "id": "fake_buyer_qr",
+      "name": "Fake Buyer QR (scan to receive)",
+      "signals": ["scan to receive", "scan this qr to get", "cashback", "qr for receiving payment"],
+      "urgency": false,
+      "asks_money": true
+    },
+    {
+      "id": "task_scam",
+      "name": "Task / Investment Scam",
+      "signals": ["earn daily", "guaranteed returns", "investment plan", "deposit to start", "task reward"],
+      "urgency": false,
+      "asks_money": true
+    },
+    {
+      "id": "otp_theft",
+      "name": "OTP / PIN Theft",
+      "signals": ["share otp", "tell me the otp", "your pin", "otp for verification", "cvv"],
+      "urgency": true,
+      "asks_money": false
+    },
+    {
+      "id": "customs_scam",
+      "name": "Customs / Parcel Scam",
+      "signals": ["parcel stuck", "customs fee", "pay to release", "international shipment"],
+      "urgency": true,
+      "asks_money": true
+    },
+    {
+      "id": "loan_app_blackmail",
+      "name": "Loan App / Extortion",
+      "signals": ["loan approved", "personal loan app", "share contacts", "morphed photos"],
+      "urgency": true,
+      "asks_money": true
+    },
+    {
+      "id": "impersonation_official",
+      "name": "Fake Official Impersonation",
+      "signals": ["from income tax", "irs", "reserve bank", "bank officer", "sebi notice"],
+      "urgency": true,
+      "asks_money": false
+    },
+    {
+      "id": "romance_scam",
+      "name": "Romance / Friendship Scam",
+      "signals": ["i love you", "stranded abroad", "send money for flight", "need urgent help"],
+      "urgency": true,
+      "asks_money": true
+    },
+    {
+      "id": "qr_overpayment",
+      "name": "Overpayment / Refund Trick",
+      "signals": ["accidentally sent extra", "refund the difference", "sent too much"],
+      "urgency": false,
+      "asks_money": true
+    }
+  ],
+  "hinglish_seed": [
+    "scan karo aur paisa lo",
+    "turant pay karo warna band ho jayega",
+    "otp batao verification ke liye"
+  ]
+}

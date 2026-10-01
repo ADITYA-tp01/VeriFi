@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "items": [
+    {
+      "title": "Load review guidance and compare both planning documents",
+      "status": "done"
+    },
+    {
+      "title": "Check phase coverage against the master plan",
+      "status": "done"
+    },
+    {
+      "title": "Identify inconsistencies, omissions, and execution risks",
+      "status": "done"
+    },
+    {
+      "title": "Report detailed alignment findings and recommendations",
+      "status": "done"
+    }
+  ],
+  "updated_at": "2026-10-01T05:14:51.102Z",
+  "session_id": "01a0f5db-bb96-744f-a064-b6ff5dcc6de3"
+}

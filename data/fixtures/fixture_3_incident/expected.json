@@ -1,0 +1,14 @@
+{
+  "mode": "INCIDENT",
+  "slots": [
+    "txn_id",
+    "bank",
+    "amount",
+    "time"
+  ],
+  "playbook_terms": [
+    "1930",
+    "cybercrime.gov.in"
+  ],
+  "personalized": true
+}
