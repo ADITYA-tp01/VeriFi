@@ -1,13 +1,18 @@
 import { Shield, Sun, Moon } from 'lucide-react';
 import { clsx } from 'clsx';
+import logoUrl from '../assets/logo.png';
 
 export default function Header({ mode, setMode, theme, setTheme }: any) {
   return (
     <header className="fixed top-0 left-0 w-full z-50 glass-panel border-t-0 border-x-0 rounded-none px-6 py-4 flex items-center justify-between">
       <div className="flex items-center gap-4">
-        <div className="relative">
-          <Shield className="w-8 h-8 text-blue-500 animate-[bounce_4s_infinite]" />
-        </div>
+        <button 
+          onClick={() => window.location.href = '/'} 
+          className="relative group flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border border-border-glass bg-white/5 hover:border-blue-500/50 transition-colors"
+          title="Go to Homepage"
+        >
+          <img src={logoUrl} alt="VeriFi Logo" className="w-12 h-12 object-cover scale-[1.3] group-hover:scale-[1.5] group-hover:rotate-12 transition-transform duration-500" />
+        </button>
         <div className="flex flex-col">
           <h1 className="font-display font-bold text-xl tracking-wide bg-accent text-transparent bg-clip-text">VeriFi</h1>
         </div>

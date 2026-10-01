@@ -16,8 +16,10 @@ export default function ScoreGauge({ score, level }: any) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-mono text-5xl font-bold">{score}</span>
-        <span className="font-mono text-sm text-text-muted">/ 135</span>
+        <div className="flex items-baseline">
+          <span className="font-mono text-5xl font-bold">{Math.round(percentage)}</span>
+          <span className="font-mono text-2xl text-text-muted ml-1">%</span>
+        </div>
       </div>
     </div>
   );
