@@ -7,3 +7,8 @@ __pycache__/
 .idea/
 *.egg-info/
 .pytest_cache/
+
+# Private planning docs
+Docs/prompt.md
+Docs/prompt_v2.md
+Docs/video_script.md
