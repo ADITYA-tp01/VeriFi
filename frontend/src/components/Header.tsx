@@ -1,4 +1,4 @@
-import { Shield, Sun, Moon } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 import { clsx } from 'clsx';
 import logoUrl from '../assets/logo.png';
 

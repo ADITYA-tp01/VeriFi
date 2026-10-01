@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Shield, ShieldAlert, Cpu, CheckCircle2, AlertTriangle, FileWarning, Info } from 'lucide-react';
+import { ShieldAlert, AlertTriangle } from 'lucide-react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import ScenarioChips from './components/ScenarioChips';
@@ -83,7 +83,7 @@ export default function App() {
     <div className="min-h-screen flex flex-col relative text-text-primary transition-colors duration-300">
       <div className="bg-orbs"></div>
       
-      <Header mode={mode} setMode={(m) => { setMode(m); setIncidentData(null); }} theme={theme} setTheme={setTheme} />
+      <Header mode={mode} setMode={(m: 'analyze' | 'incident') => { setMode(m); setIncidentData(null); }} theme={theme} setTheme={setTheme} />
       
       <main className="flex-1 w-full max-w-[1200px] mx-auto px-6 pt-24 pb-16 flex flex-col gap-8">
         {mode === 'analyze' ? (

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Shield, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import logoUrl from '../assets/logo.png';
 
 export default function IncidentChat({ onComplete }: { onComplete?: (data: any) => void }) {
