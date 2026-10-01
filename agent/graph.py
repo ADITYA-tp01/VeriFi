@@ -306,7 +306,12 @@ Rules: explain WHY each point was awarded; NEVER change the score; NEVER say 'sa
 if level is NO_STRONG_INDICATORS say 'no strong indicators detected'. Keep under 120 words.
 End with a short action plan."""
     if hinglish:
-        prompt += "\nThe user's message was in Hinglish — reply in Hinglish (Roman script, Hindi-English mix)."
+        prompt += (
+            "\nCRITICAL LANGUAGE RULE: You MUST reply ONLY in Hinglish (Hindi "
+            "written in Roman/Latin script), like 'Aapko ye message scan nahi "
+            "karna chahiye...'. Do NOT reply in English at all. Your first word "
+            "must be Hindi in Roman script."
+        )
 
     api_key = os.getenv("GROQ_API_KEY") or os.getenv("GROQ_API_KEY_BACKUP")
     explanation = None

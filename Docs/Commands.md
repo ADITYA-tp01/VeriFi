@@ -95,6 +95,14 @@ Opens at **http://localhost:8501** — keep this window open.
 1. Click **"Fixture 2: Lookalike"**
 2. Point at url intel trace: `malicious=True brand_mismatch=True`
 
+### Shot F — Clarify Loop live (15 sec, optional — show the agent ASKING)
+
+1. Type `payment` in the text box **and** attach Fixture 1's QR (`data\fixtures\fixture_1_mismatch\qr.png`)
+2. Click **Analyze** → agent asks: *"Is this message asking you to pay money or receive money?"*
+3. Type `receive` → Submit
+4. Point at the trace: user answer trusted → **mismatch +40 fires** → re-scored → explained
+   > "When unsure, the agent asks instead of guessing — then re-plans with your answer."
+
 ---
 
 ## 5. Backup / Insurance Commands
