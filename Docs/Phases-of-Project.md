@@ -306,7 +306,7 @@ If the gate fails at 12:30 → **everyone swarms it.**
 
 **README contents:**
 - [x] Architecture diagram (Part 1)
-- [ ] **"Why these weights" paragraph** (Plan Part 3 — judges WILL ask):
+- [x] **"Why these weights" paragraph** (Plan Part 3 — judges WILL ask):
   > *Weights encode evidentiary strength, not vibes. The Intent-Mechanism Mismatch (40) is weighted highest because it is direct proof of deception — the mechanism contradicts the narrative. Known-malicious domains (50) are ground truth. Social-engineering signals are capped lowest (30) because urgency alone has legitimate uses (banks really do send KYC reminders). Category caps prevent correlated signals — punycode, brand mismatch and domain age often describe one underlying fact — from triple-counting. Thresholds were tuned on our 30-scenario benchmark to maximize recall on scam cases while keeping false positives on legitimate UPI requests at zero.*
 - [x] Setup instructions
 - [x] Eval results (measured)
