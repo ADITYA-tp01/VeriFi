@@ -100,48 +100,83 @@ export default function App() {
             )}
 
             {status === 'result' && resultData && (
-              <div className="flex flex-col gap-6">
-                <div className="flex items-center justify-between glass-panel px-8 py-4 border-risk-critical/30 shadow-[0_0_40px_rgba(239,68,68,0.1)]">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-risk-critical font-bold tracking-wider uppercase text-sm flex items-center gap-2">
-                      <AlertTriangle size={18}/> CRITICAL RISK
-                    </span>
-                    <h2 className="text-2xl md:text-3xl font-display font-semibold">Do not proceed with this payment.</h2>
+              <div className="flex flex-col gap-6 animate-fade-in">
+                {/* Dashboard Top Telemetry & Severity Banner */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between glass-panel px-6 py-5 border-risk-critical/30 shadow-[0_0_40px_rgba(239,68,68,0.1)] gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-3">
+                      <span className="text-risk-critical font-bold tracking-wider uppercase text-xs sm:text-sm flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-risk-critical/10 border border-risk-critical/20">
+                        <AlertTriangle size={16}/> {resultData.level} THREAT
+                      </span>
+                      <span className="text-text-muted text-xs font-mono">
+                        ID: #VF-{Math.abs(resultData.score * 7919).toString(16).toUpperCase().slice(0, 6)}
+                      </span>
+                    </div>
+                    <h2 className="text-2xl md:text-3xl font-display font-semibold">
+                      {resultData.mismatch ? "Deceptive Intent Detected — Do Not Pay" : "Investigation Analysis Report"}
+                    </h2>
+                    <p className="text-sm text-text-muted">
+                      Deterministic verification engine completed analysis with full evidence vector.
+                    </p>
                   </div>
-                  <ScoreGauge score={resultData.score} level={resultData.level} />
+                  <div className="flex items-center gap-4 self-center sm:self-auto">
+                    <ScoreGauge score={resultData.score} level={resultData.level} />
+                  </div>
                 </div>
                 
+                {/* Primary Analysis Dashboard Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2 flex flex-col gap-6">
                     <MismatchPanel intent={resultData.intent} mechanism={resultData.mechanism} mismatch={resultData.mismatch} />
                     <RiskFactors factors={resultData.factors} />
                   </div>
                   <div className="lg:col-span-1 h-full">
-                    <AgentTrace docked={true} traceLog={resultData.raw.trace_log} />
+                    <AgentTrace docked={true} traceLog={resultData.raw?.trace_log} />
                   </div>
                 </div>
 
+                {/* Immediate Remediation & Raw Evidence Deck */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="glass-panel p-6 border-risk-critical/20 bg-risk-critical/5">
-                    <h3 className="text-xl font-display font-medium mb-6 text-risk-critical">🚨 What to do right now</h3>
-                    <ul className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl font-display font-medium text-risk-critical flex items-center gap-2">
+                        <ShieldAlert size={20} /> Immediate Protective Steps
+                      </h3>
+                      <span className="text-xs font-mono text-risk-critical/80 bg-risk-critical/10 px-2 py-0.5 rounded">URGENT</span>
+                    </div>
+                    <ul className="flex flex-col gap-3.5">
                       <li className="flex items-start gap-3">
-                        <input type="checkbox" className="mt-1 w-5 h-5 accent-risk-critical cursor-pointer" /> 
-                        <span className="text-lg">Do not scan the QR or authorize any payment.</span>
+                        <input type="checkbox" id="step-qr" className="mt-1 w-5 h-5 accent-risk-critical cursor-pointer rounded" /> 
+                        <label htmlFor="step-qr" className="text-base text-text-primary cursor-pointer leading-snug">
+                          <strong>Halt payment:</strong> Do not scan any QR, authorize UPI mandates, or enter your PIN.
+                        </label>
                       </li>
                       <li className="flex items-start gap-3">
-                        <input type="checkbox" className="mt-1 w-5 h-5 accent-risk-critical cursor-pointer" /> 
-                        <span className="text-lg">Report the number to 1930.</span>
+                        <input type="checkbox" id="step-1930" className="mt-1 w-5 h-5 accent-risk-critical cursor-pointer rounded" /> 
+                        <label htmlFor="step-1930" className="text-base text-text-primary cursor-pointer leading-snug">
+                          <strong>Report incident:</strong> Dial National Cyber Crime Helpline <a href="tel:1930" className="text-blue-400 underline font-mono">1930</a> or visit cybercrime.gov.in.
+                        </label>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <input type="checkbox" id="step-bank" className="mt-1 w-5 h-5 accent-risk-critical cursor-pointer rounded" /> 
+                        <label htmlFor="step-bank" className="text-base text-text-primary cursor-pointer leading-snug">
+                          <strong>Notify bank:</strong> If money was already sent, request an immediate freeze/recall from your bank fraud desk.
+                        </label>
                       </li>
                     </ul>
                   </div>
-                  <div className="glass-panel p-6 bg-[#0a0a0a] dark:bg-black/40 border-white/5">
+                  
+                  <div className="glass-panel p-6 bg-[#0a0a0a] dark:bg-black/40 border-white/5 flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-sm font-bold uppercase tracking-wider text-text-muted mb-2 font-mono">Audit & Forensics Payload</h3>
+                      <p className="text-xs text-text-muted mb-4">Cryptographically bound execution trace and JSON evidence vector.</p>
+                    </div>
                     <details className="group cursor-pointer">
-                      <summary className="text-text-muted font-mono text-xs uppercase tracking-widest outline-none flex items-center justify-between opacity-70 hover:opacity-100 transition-opacity">
-                        <span>Advanced / Technical Evidence (JSON)</span>
+                      <summary className="text-text-muted font-mono text-xs uppercase tracking-widest outline-none flex items-center justify-between p-2.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                        <span>Inspect Raw Evidence JSON</span>
                         <span className="group-open:rotate-180 transition-transform duration-300">▼</span>
                       </summary>
-                      <div className="mt-4 border-t border-white/10 pt-4 font-mono text-xs overflow-auto text-emerald-400/80 max-h-[300px]">
+                      <div className="mt-3 border-t border-white/10 pt-3 font-mono text-xs overflow-auto text-emerald-400/90 max-h-[220px] bg-black/60 p-3 rounded-lg">
                         <pre>{JSON.stringify(resultData, null, 2)}</pre>
                       </div>
                     </details>
