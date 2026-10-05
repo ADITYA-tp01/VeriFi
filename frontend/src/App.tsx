@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ShieldAlert, AlertTriangle } from 'lucide-react';
+import { ShieldAlert, AlertTriangle, ArrowLeft, RefreshCw, AlertCircle } from 'lucide-react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import ScenarioChips from './components/ScenarioChips';
@@ -20,6 +20,7 @@ export default function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [status, setStatus] = useState<'landing' | 'analyzing' | 'result'>('landing');
   const [resultData, setResultData] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [incidentData, setIncidentData] = useState<any>(null);
 
@@ -31,9 +32,16 @@ export default function App() {
     }
   }, [theme]);
 
+  const resetToLanding = () => {
+    setStatus('landing');
+    setResultData(null);
+    setErrorMsg(null);
+  };
+
   // Real API connection
   const runInvestigation = async (type: string, data: any) => {
     setStatus('analyzing');
+    setErrorMsg(null);
     try {
       const formData = new FormData();
       if (type === 'qr' && data instanceof File) {
@@ -47,6 +55,11 @@ export default function App() {
         method: 'POST',
         body: formData
       });
+
+      if (!res.ok) {
+        throw new Error(`API returned status ${res.status}: ${res.statusText}`);
+      }
+
       const resData = await res.json();
       
       // Map backend response to UI structure
@@ -73,8 +86,9 @@ export default function App() {
       });
       
       setStatus('result');
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      setErrorMsg(error?.message || "Failed to complete investigation. Please ensure backend service is active.");
       setStatus('landing');
     }
   };
@@ -88,6 +102,21 @@ export default function App() {
       <main className="flex-1 w-full max-w-[1200px] mx-auto px-6 pt-24 pb-16 flex flex-col gap-8">
         {mode === 'analyze' ? (
           <>
+            {errorMsg && (
+              <div className="glass-panel p-4 border-red-500/30 bg-red-500/10 flex items-center justify-between gap-4 text-red-200 animate-fade-in">
+                <div className="flex items-center gap-3">
+                  <AlertCircle size={20} className="text-red-400 shrink-0" />
+                  <span className="text-sm">{errorMsg}</span>
+                </div>
+                <button 
+                  onClick={() => setErrorMsg(null)}
+                  className="text-xs px-3 py-1 rounded bg-red-500/20 hover:bg-red-500/30 text-white font-mono transition-colors"
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
+
             {status === 'landing' && (
               <>
                 <Hero onRun={runInvestigation} />
@@ -101,6 +130,17 @@ export default function App() {
 
             {status === 'result' && resultData && (
               <div className="flex flex-col gap-6 animate-fade-in">
+                {/* Back to Input Navigation Action */}
+                <div className="flex items-center justify-between">
+                  <button 
+                    onClick={resetToLanding}
+                    className="flex items-center gap-2 text-sm text-text-muted hover:text-text-primary px-3.5 py-1.5 rounded-lg border border-border-glass hover:bg-white/5 transition-colors font-medium"
+                  >
+                    <ArrowLeft size={16} /> Start New Scan
+                  </button>
+                  <span className="text-xs font-mono text-text-muted">Report finalized with cryptographic hash</span>
+                </div>
+
                 {/* Dashboard Top Telemetry & Severity Banner */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between glass-panel px-6 py-5 border-risk-critical/30 shadow-[0_0_40px_rgba(239,68,68,0.1)] gap-4">
                   <div className="flex flex-col gap-1.5">
